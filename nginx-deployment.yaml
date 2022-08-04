@@ -21,6 +21,17 @@ spec:
       containers:
         - name: pv-container
           image: nginx
+          env:
+            - name: secret-01-user
+              valueFrom:
+                secretKeyRef:
+                  name: secret-01
+                  key: username
+            - name: secret-01-password
+              valueFrom:
+                secretKeyRef:
+                  name: secret-01
+                  key: password  
           ports:
             - containerPort: 80
               name: "http-server"
