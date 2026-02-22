@@ -17,6 +17,8 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      padding: 16px;
+      box-sizing: border-box;
     }
 
     .card {
@@ -25,6 +27,8 @@
       border-radius: 12px;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      max-width: 760px;
+      width: 100%;
     }
 
     h1 {
@@ -56,6 +60,39 @@
       color: #94a3b8;
       font-size: 0.9rem;
     }
+
+    .actions {
+      margin-top: 24px;
+    }
+
+    .link-btn {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 8px;
+      background: #0ea5e9;
+      color: #082f49;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .link-btn:hover {
+      background: #38bdf8;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .card {
+        padding: 24px;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+      }
+    }
   </style>
 
 </head>
@@ -66,7 +103,7 @@
   <h1>🚀 HELLO WORLD — VERSION 2 🚀</h1>
 
   <div class="success">
-    ✅ This is the UPDATED container running from Docker Hub! And I testing this shit!
+    ✅ This is the updated container running from Docker Hub and Kubernetes.
   </div>
 
   <div class="timestamp" id="time"></div>
@@ -77,6 +114,10 @@
 
   <div class="footer">
     Version: v2 • Kubernetes Rollout Test
+  </div>
+
+  <div class="actions">
+    <a class="link-btn" href="/solution.html">View Solution Overview</a>
   </div>
 
 </div>

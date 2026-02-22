@@ -4,8 +4,8 @@ FROM nginx:alpine
 # Remove default nginx static files
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy your custom index.html
-COPY index.html /usr/share/nginx/html/index.html
+# Copy static pages
+COPY index.html solution.html /usr/share/nginx/html/
 
 # Ensure nginx serves UTF-8 encoding
 RUN printf "server {\n\
