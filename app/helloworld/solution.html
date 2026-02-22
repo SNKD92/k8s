@@ -256,39 +256,87 @@
     }
 
     .flow h2 {
-      margin: 0 0 10px;
+      margin: 0;
       color: var(--accent-soft);
       font-size: 1.04rem;
     }
 
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
+    .flow-intro {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
     }
 
-    .step {
+    .timeline {
+      margin-top: 12px;
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 18px;
+      border-top: 1px dashed rgba(125, 211, 252, 0.35);
+      z-index: 0;
+    }
+
+    .phase {
+      position: relative;
+      z-index: 1;
       background: rgba(5, 14, 29, 0.62);
       border: 1px solid rgba(125, 211, 252, 0.22);
       border-radius: 10px;
-      padding: 10px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      text-align: center;
+      padding: 28px 10px 10px;
     }
 
-    .step span {
-      display: inline-flex;
+    .phase-index {
+      position: absolute;
+      left: 10px;
+      top: -9px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      margin-bottom: 6px;
       background: rgba(52, 211, 153, 0.2);
       color: var(--good);
       font-weight: 800;
-      font-size: 0.76rem;
+      font-size: 0.78rem;
+      border: 1px solid rgba(52, 211, 153, 0.45);
+    }
+
+    .phase-title {
+      margin: 0;
+      color: var(--text);
+      font-size: 0.83rem;
+      font-weight: 700;
+    }
+
+    .phase-cmd {
+      margin: 6px 0 0;
+      font-size: 0.8rem;
+    }
+
+    .phase-cmd code {
+      display: inline-block;
+      width: 100%;
+      padding: 5px 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .phase-note {
+      margin: 6px 0 0;
+      font-size: 0.74rem;
+      line-height: 1.35;
+      color: var(--muted);
     }
 
     .footer {
@@ -307,8 +355,12 @@
         grid-template-columns: 1fr;
       }
 
-      .steps {
+      .timeline {
         grid-template-columns: 1fr;
+      }
+
+      .timeline::before {
+        display: none;
       }
     }
 
@@ -437,16 +489,43 @@
     </section>
 
     <section class="flow" id="flow">
-      <h2>Release Flow</h2>
-      <div class="steps">
-        <div class="step"><span>1</span>Terraform Infra</div>
-        <div class="step"><span>2</span>Apply TLS Setup</div>
-        <div class="step"><span>3</span>Deploy K8s App</div>
-        <div class="step"><span>4</span>Push to Main</div>
-        <div class="step"><span>5</span>Auto Rollout</div>
+      <h2>Release Flow (Real Sequence)</h2>
+      <p class="flow-intro">This is the actual order used in this repo and deployment pipeline.</p>
+      <div class="timeline">
+        <article class="phase">
+          <span class="phase-index">1</span>
+          <h3 class="phase-title">Infra baseline</h3>
+          <p class="phase-cmd"><code>terraform apply</code></p>
+          <p class="phase-note">Used when cluster/IAM config changes.</p>
+        </article>
+        <article class="phase">
+          <span class="phase-index">2</span>
+          <h3 class="phase-title">TLS and DNS challenge</h3>
+          <p class="phase-cmd"><code>kubectl apply -f k8s/cert-manager/</code></p>
+          <p class="phase-note">Certificate is issued and stored as ingress secret.</p>
+        </article>
+        <article class="phase">
+          <span class="phase-index">3</span>
+          <h3 class="phase-title">App manifests live</h3>
+          <p class="phase-cmd"><code>kubectl apply -f k8s/app/</code></p>
+          <p class="phase-note">Deployment + service + ingress become active.</p>
+        </article>
+        <article class="phase">
+          <span class="phase-index">4</span>
+          <h3 class="phase-title">Delivery trigger</h3>
+          <p class="phase-cmd"><code>git push origin main</code></p>
+          <p class="phase-note">Push starts <code>.github/workflows/deploy.yml</code>.</p>
+        </article>
+        <article class="phase">
+          <span class="phase-index">5</span>
+          <h3 class="phase-title">Rolling update</h3>
+          <p class="phase-cmd"><code>kubectl rollout status deployment/helloworld-deployment</code></p>
+          <p class="phase-note">Pipeline completes only after rollout is healthy.</p>
+        </article>
       </div>
       <div class="links" style="margin-top: 10px;">
         <a href="https://github.com/SNKD92/k8s/blob/main/README.MD" target="_blank" rel="noopener noreferrer">deployment guide</a>
+        <a href="https://github.com/SNKD92/k8s/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener noreferrer">deploy workflow</a>
         <a href="https://github.com/SNKD92/k8s/tree/main/k8s" target="_blank" rel="noopener noreferrer">k8s manifests</a>
       </div>
     </section>
