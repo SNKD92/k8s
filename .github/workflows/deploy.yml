@@ -32,7 +32,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t $IMAGE_NAME:${{ steps.version.outputs.VERSION }} .
+        docker build -t $IMAGE_NAME:${{ steps.version.outputs.VERSION }} ./app/helloworld
         docker tag $IMAGE_NAME:${{ steps.version.outputs.VERSION }} $IMAGE_NAME:latest
 
 
