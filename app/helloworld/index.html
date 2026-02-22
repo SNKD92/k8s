@@ -226,8 +226,8 @@
 
       <div class="meta-row">
         <div class="meta">
-          <span class="label">Container Build Time (UTC)</span>
-          <span class="value" id="build-time">__BUILD_TIME_UTC__</span>
+          <span class="label">Container Build Time (Your Local Time)</span>
+          <span class="value" id="build-time">Loading...</span>
         </div>
         <div class="meta">
           <span class="label">Your Local Time</span>
@@ -265,6 +265,17 @@
   </main>
 
   <script>
+    (function renderBuildTime() {
+      var buildIso = "__BUILD_TIME_ISO__";
+      var buildTimeEl = document.getElementById("build-time");
+      var buildDate = new Date(buildIso);
+      if (Number.isNaN(buildDate.getTime())) {
+        buildTimeEl.innerText = "Unavailable";
+        return;
+      }
+      buildTimeEl.innerText = buildDate.toLocaleString();
+    })();
+
     document.getElementById("viewer-time").innerText = new Date().toLocaleString();
   </script>
 </body>

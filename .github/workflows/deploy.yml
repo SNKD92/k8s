@@ -53,7 +53,7 @@ jobs:
     - name: Build Docker image
       run: |
         docker build \
-          --build-arg BUILD_TIME_UTC="$(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
+          --build-arg BUILD_TIME_ISO="$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
           -t $IMAGE_NAME:${{ steps.version.outputs.VERSION }} \
           ./app/helloworld
         docker tag $IMAGE_NAME:${{ steps.version.outputs.VERSION }} $IMAGE_NAME:latest

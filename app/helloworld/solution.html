@@ -375,8 +375,8 @@
         <a class="btn btn-secondary" href="https://github.com/SNKD92/k8s" target="_blank" rel="noopener noreferrer">View Repository</a>
       </div>
       <div class="build-meta">
-        Container build time (UTC)
-        <span class="mono">__BUILD_TIME_UTC__</span>
+        Container build time (your local time)
+        <span class="mono" id="build-time-local">Loading...</span>
       </div>
     </section>
 
@@ -522,5 +522,17 @@
 
     <p class="footer">NENMP architecture summary for business and engineering readers.</p>
   </main>
+  <script>
+    (function renderBuildTime() {
+      var buildIso = "__BUILD_TIME_ISO__";
+      var buildTimeEl = document.getElementById("build-time-local");
+      var buildDate = new Date(buildIso);
+      if (Number.isNaN(buildDate.getTime())) {
+        buildTimeEl.innerText = "Unavailable";
+        return;
+      }
+      buildTimeEl.innerText = buildDate.toLocaleString();
+    })();
+  </script>
 </body>
 </html>
