@@ -9,6 +9,7 @@ ARG BUILD_TIME_UTC=auto
 
 # Copy static pages
 COPY index.html solution.html /usr/share/nginx/html/
+COPY diagrams/ /usr/share/nginx/html/diagrams/
 
 # Inject image build time into static pages
 RUN BUILD_TS="$BUILD_TIME_UTC"; \

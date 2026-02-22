@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-label="Cert-Manager diagram">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#031226"/>
+      <stop offset="1" stop-color="#13233f"/>
+    </linearGradient>
+    <linearGradient id="box" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#0b2a4e"/>
+      <stop offset="1" stop-color="#123963"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7dd3fc"/>
+    </marker>
+  </defs>
+  <rect width="960" height="320" fill="url(#bg)"/>
+  <text x="28" y="38" fill="#7dd3fc" font-family="Manrope, Arial" font-size="22" font-weight="700">Cert-Manager Picture + Diagram</text>
+  <text x="28" y="62" fill="#b6c5dd" font-family="Manrope, Arial" font-size="14">DNS-01 challenge validates domain ownership before TLS cert is issued.</text>
+
+  <rect x="40" y="98" width="210" height="150" rx="14" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="62" y="130" fill="#e8f0ff" font-size="17" font-family="Manrope, Arial" font-weight="700">Cert-Manager</text>
+  <text x="62" y="156" fill="#b6c5dd" font-size="13" font-family="Manrope, Arial">ClusterIssuer</text>
+  <text x="62" y="176" fill="#b6c5dd" font-size="13" font-family="Manrope, Arial">Certificate</text>
+
+  <rect x="360" y="98" width="240" height="150" rx="14" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="382" y="130" fill="#e8f0ff" font-size="17" font-family="Manrope, Arial" font-weight="700">Cloudflare DNS</text>
+  <text x="382" y="156" fill="#b6c5dd" font-size="13" font-family="Manrope, Arial">TXT challenge record</text>
+  <text x="382" y="176" fill="#b6c5dd" font-size="13" font-family="Manrope, Arial">api-token secret</text>
+
+  <rect x="710" y="98" width="210" height="150" rx="14" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="732" y="130" fill="#e8f0ff" font-size="17" font-family="Manrope, Arial" font-weight="700">Let's Encrypt</text>
+  <text x="732" y="156" fill="#b6c5dd" font-size="13" font-family="Manrope, Arial">ACME validation</text>
+  <text x="732" y="176" fill="#b6c5dd" font-size="13" font-family="Manrope, Arial">TLS certificate</text>
+
+  <line x1="250" y1="172" x2="350" y2="172" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="600" y1="172" x2="700" y2="172" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
+</svg>

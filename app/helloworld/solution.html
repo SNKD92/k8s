@@ -221,6 +221,20 @@
       font-size: 0.86rem;
     }
 
+    .diagram {
+      margin-top: 10px;
+      border: 1px solid rgba(125, 211, 252, 0.24);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(5, 14, 29, 0.58);
+    }
+
+    .diagram img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
     code {
       font-family: "IBM Plex Mono", monospace;
       background: var(--mono-bg);
@@ -385,7 +399,7 @@
       <h1>NENMP Platform Overview</h1>
       <p class="subtitle">
         This page documents the full solution in this repository: Terraform infrastructure,
-        application packaging, Kubernetes deployment, cert-manager TLS setup, and CI/CD delivery.
+        application packaging, Kubernetes deployment, Cert-Manager TLS setup, and CI/CD delivery.
       </p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="/">Back to Home</a>
@@ -401,7 +415,7 @@
       <a href="#infra">Infrastructure</a>
       <a href="#app">Application</a>
       <a href="#k8s">Kubernetes</a>
-      <a href="#cert">cert-manager</a>
+      <a href="#cert">Cert-Manager</a>
       <a href="#cicd">CI/CD</a>
       <a href="#security">Identity</a>
       <a href="#flow">Flow</a>
@@ -427,6 +441,9 @@
         <h2>Infrastructure</h2>
         <p class="plain">Cloud setup is automated and repeatable.</p>
         <p class="tech">Tech: <code>small-gke</code> in <code>us-central1-a</code>, created by Terraform with cost-focused nodes.</p>
+        <figure class="diagram">
+          <img src="/diagrams/infrastructure.svg" alt="Infrastructure diagram showing Terraform creating IAM and GKE resources in Google Cloud." loading="lazy">
+        </figure>
         <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/infra/terraform/gke.tf" target="_blank" rel="noopener noreferrer">gke.tf</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/infra/terraform/main.tf" target="_blank" rel="noopener noreferrer">main.tf</a>
@@ -438,6 +455,9 @@
         <h2>Application</h2>
         <p class="plain">A lightweight static site runs inside an NGINX container.</p>
         <p class="tech">Tech: built from <code>nginx:alpine</code>; build metadata is injected at image build time.</p>
+        <figure class="diagram">
+          <img src="/diagrams/application.svg" alt="Application diagram showing static pages served by an NGINX container." loading="lazy">
+        </figure>
         <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/Dockerfile" target="_blank" rel="noopener noreferrer">Dockerfile</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/index.html" target="_blank" rel="noopener noreferrer">index.html</a>
@@ -449,6 +469,9 @@
         <h2>Kubernetes</h2>
         <p class="plain">Kubernetes keeps service uptime and routes traffic.</p>
         <p class="tech">Tech: deployment replicas + ClusterIP service + ingress with TLS termination.</p>
+        <figure class="diagram">
+          <img src="/diagrams/kubernetes.svg" alt="Kubernetes diagram showing ingress, service, and replicated pods." loading="lazy">
+        </figure>
         <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/deployment.yaml" target="_blank" rel="noopener noreferrer">deployment.yaml</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/service.yaml" target="_blank" rel="noopener noreferrer">service.yaml</a>
@@ -457,9 +480,12 @@
       </article>
 
       <article class="card" id="cert">
-        <h2>cert-manager</h2>
+        <h2>Cert-Manager</h2>
         <p class="plain">HTTPS certificates are issued and renewed automatically.</p>
         <p class="tech">Tech: Let&apos;s Encrypt ACME + Cloudflare DNS challenge, stored in <code>deniskachar-com-tls</code>.</p>
+        <figure class="diagram">
+          <img src="/diagrams/cert-manager.svg" alt="Certificate management diagram showing Cert-Manager, Let's Encrypt, and Cloudflare DNS challenge." loading="lazy">
+        </figure>
         <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/cert-manager/clusterissuer.yaml" target="_blank" rel="noopener noreferrer">clusterissuer.yaml</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/cert-manager/certificate.yaml" target="_blank" rel="noopener noreferrer">certificate.yaml</a>
@@ -471,6 +497,9 @@
         <h2>CI/CD</h2>
         <p class="plain">Push to <code>main</code> can publish and deploy automatically.</p>
         <p class="tech">Tech: build and push image tags, authenticate to GCP, then run <code>kubectl set image</code>.</p>
+        <figure class="diagram">
+          <img src="/diagrams/cicd.svg" alt="CI/CD diagram showing GitHub Actions building and deploying to Kubernetes." loading="lazy">
+        </figure>
         <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener noreferrer">deploy.yml</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/deployment.yaml" target="_blank" rel="noopener noreferrer">deployment target</a>
@@ -481,6 +510,9 @@
         <h2>Identity and Secrets</h2>
         <p class="plain">Access is short-lived and keyless by design.</p>
         <p class="tech">Tech: GitHub OIDC federation + Workload Identity; credentials remain in secret managers.</p>
+        <figure class="diagram">
+          <img src="/diagrams/identity.svg" alt="Identity diagram showing GitHub OIDC tokens exchanged for short-lived Google credentials." loading="lazy">
+        </figure>
         <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/infra/terraform/sa.tf" target="_blank" rel="noopener noreferrer">sa.tf</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener noreferrer">auth in workflow</a>
@@ -491,6 +523,9 @@
     <section class="flow" id="flow">
       <h2>Release Flow (Real Sequence)</h2>
       <p class="flow-intro">This is the actual order used in this repo and deployment pipeline.</p>
+      <figure class="diagram">
+        <img src="/diagrams/release-flow.svg" alt="Release flow diagram from Terraform setup to GitHub Actions rollout." loading="lazy">
+      </figure>
       <div class="timeline">
         <article class="phase">
           <span class="phase-index">1</span>
