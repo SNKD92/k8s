@@ -7,22 +7,39 @@ on:
 
 env:
   IMAGE_NAME: snkd92/helloworld
+  PROJECT_ID: project-e7b71f6e-c56d-438f-a7e
+  PROJECT_NUMBER: 365212276900
+  CLUSTER_NAME: small-gke
+  CLUSTER_ZONE: us-central1-a
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write   # REQUIRED for Workload Identity Federation
+
     steps:
 
+    # -----------------------------
+    # Checkout repository
+    # -----------------------------
     - name: Checkout repository
       uses: actions/checkout@v4
 
 
+    # -----------------------------
+    # Generate unique version tag
+    # -----------------------------
     - name: Generate version tag
       id: version
       run: echo "VERSION=$(date +%s)" >> $GITHUB_OUTPUT
 
 
+    # -----------------------------
+    # Login to Docker Hub
+    # -----------------------------
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
@@ -30,27 +47,57 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
 
+    # -----------------------------
+    # Build Docker image
+    # -----------------------------
     - name: Build Docker image
       run: |
         docker build -t $IMAGE_NAME:${{ steps.version.outputs.VERSION }} ./app/helloworld
         docker tag $IMAGE_NAME:${{ steps.version.outputs.VERSION }} $IMAGE_NAME:latest
 
 
+    # -----------------------------
+    # Push Docker image
+    # -----------------------------
     - name: Push Docker image
       run: |
         docker push $IMAGE_NAME:${{ steps.version.outputs.VERSION }}
         docker push $IMAGE_NAME:latest
 
 
-    - name: Setup kubeconfig
+    # -----------------------------
+    # Authenticate to Google Cloud via Workload Identity Federation
+    # -----------------------------
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: projects/365212276900/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+        service_account: github-actions@project-e7b71f6e-c56d-438f-a7e.iam.gserviceaccount.com
+
+
+    # -----------------------------
+    # Setup gcloud CLI
+    # -----------------------------
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@v2
+
+
+    # -----------------------------
+    # Get GKE credentials
+    # -----------------------------
+    - name: Get GKE credentials
       run: |
-        mkdir -p ~/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+        gcloud container clusters get-credentials small-gke \
+          --zone us-central1-a \
+          --project project-e7b71f6e-c56d-438f-a7e
 
 
+    # -----------------------------
+    # Deploy to Kubernetes
+    # -----------------------------
     - name: Deploy to Kubernetes
       run: |
         kubectl set image deployment/helloworld-deployment \
-        helloworld=$IMAGE_NAME:${{ steps.version.outputs.VERSION }}
+          helloworld=$IMAGE_NAME:${{ steps.version.outputs.VERSION }}
 
         kubectl rollout status deployment/helloworld-deployment
