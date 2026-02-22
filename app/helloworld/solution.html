@@ -11,13 +11,16 @@
     :root {
       --bg-start: #031226;
       --bg-end: #13233f;
-      --panel: rgba(9, 20, 40, 0.82);
+      --panel: rgba(9, 20, 40, 0.84);
+      --panel-soft: rgba(9, 20, 40, 0.72);
       --panel-border: rgba(125, 211, 252, 0.22);
       --text: #e8f0ff;
       --muted: #b6c5dd;
       --accent: #22d3ee;
       --accent-soft: #7dd3fc;
       --mono-bg: rgba(9, 26, 50, 0.9);
+      --good: #34d399;
+      --shadow: 0 14px 36px rgba(3, 14, 31, 0.44);
     }
 
     * {
@@ -37,7 +40,7 @@
     }
 
     .container {
-      width: min(900px, calc(100% - 26px));
+      width: min(980px, calc(100% - 26px));
       margin: 24px auto 36px;
     }
 
@@ -46,7 +49,7 @@
       border: 1px solid var(--panel-border);
       border-radius: 16px;
       padding: 26px;
-      box-shadow: 0 14px 36px rgba(3, 14, 31, 0.44);
+      box-shadow: var(--shadow);
     }
 
     .eyebrow {
@@ -127,7 +130,7 @@
 
     .jump {
       margin-top: 14px;
-      background: rgba(8, 19, 39, 0.74);
+      background: var(--panel-soft);
       border: 1px solid rgba(125, 211, 252, 0.18);
       border-radius: 12px;
       padding: 12px;
@@ -146,10 +149,36 @@
       background: rgba(5, 14, 29, 0.62);
     }
 
+    .glance {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .glance-card {
+      background: var(--panel-soft);
+      border: 1px solid rgba(125, 211, 252, 0.18);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .glance-card h2 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      color: var(--accent-soft);
+    }
+
+    .glance-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
     .stack {
       margin-top: 14px;
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
 
@@ -157,45 +186,39 @@
       background: var(--panel);
       border: 1px solid rgba(182, 197, 221, 0.22);
       border-radius: 14px;
-      padding: 18px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #22d3ee, #7dd3fc);
+      opacity: 0.8;
     }
 
     .card h2 {
-      margin: 0;
+      margin: 0 0 6px;
       color: var(--accent-soft);
-      font-size: 1.08rem;
+      font-size: 1.04rem;
     }
 
     .plain {
-      margin: 8px 0 0;
+      margin: 0;
       color: var(--text);
-      font-weight: 600;
-    }
-
-    details {
-      margin-top: 10px;
-      border: 1px dashed rgba(125, 211, 252, 0.28);
-      border-radius: 10px;
-      padding: 10px;
-      background: rgba(6, 14, 29, 0.45);
-    }
-
-    summary {
-      cursor: pointer;
-      color: var(--muted);
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.93rem;
     }
 
-    ul,
-    ol {
-      margin: 10px 0 0;
-      padding-left: 19px;
-    }
-
-    li {
-      margin-bottom: 7px;
+    .tech {
+      margin: 7px 0 0;
       color: var(--muted);
+      font-size: 0.86rem;
     }
 
     code {
@@ -204,20 +227,68 @@
       color: var(--accent-soft);
       border-radius: 6px;
       padding: 1px 6px;
-      font-size: 0.86rem;
+      font-size: 0.82rem;
     }
 
     .links {
       margin-top: 10px;
-      font-size: 0.86rem;
-      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .links a {
       color: var(--accent);
       text-decoration: none;
-      margin-right: 10px;
-      white-space: nowrap;
+      font-size: 0.8rem;
+      border: 1px solid rgba(125, 211, 252, 0.3);
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: rgba(5, 14, 29, 0.55);
+    }
+
+    .flow {
+      margin-top: 14px;
+      background: var(--panel-soft);
+      border: 1px solid rgba(182, 197, 221, 0.22);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .flow h2 {
+      margin: 0 0 10px;
+      color: var(--accent-soft);
+      font-size: 1.04rem;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .step {
+      background: rgba(5, 14, 29, 0.62);
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .step span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin-bottom: 6px;
+      background: rgba(52, 211, 153, 0.2);
+      color: var(--good);
+      font-weight: 800;
+      font-size: 0.76rem;
     }
 
     .footer {
@@ -227,6 +298,20 @@
       text-align: center;
     }
 
+    @media (max-width: 900px) {
+      .glance {
+        grid-template-columns: 1fr;
+      }
+
+      .stack {
+        grid-template-columns: 1fr;
+      }
+
+      .steps {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 640px) {
       .container {
         width: calc(100% - 16px);
@@ -234,7 +319,8 @@
       }
 
       .hero,
-      .card {
+      .card,
+      .flow {
         padding: 14px;
       }
     }
@@ -265,145 +351,107 @@
       <a href="#k8s">Kubernetes</a>
       <a href="#cert">cert-manager</a>
       <a href="#cicd">CI/CD</a>
-      <a href="#security">Identity and Secrets</a>
-      <a href="#flow">Delivery Flow</a>
+      <a href="#security">Identity</a>
+      <a href="#flow">Flow</a>
     </nav>
+
+    <section class="glance">
+      <article class="glance-card">
+        <h2>1 Cloud Base</h2>
+        <p>Terraform provisions GKE and IAM foundations.</p>
+      </article>
+      <article class="glance-card">
+        <h2>2 App Delivery</h2>
+        <p>GitHub Actions builds, tags, pushes, and rolls out.</p>
+      </article>
+      <article class="glance-card">
+        <h2>3 Secure Access</h2>
+        <p>OIDC + secret stores avoid long-lived keys in code.</p>
+      </article>
+    </section>
 
     <section class="stack">
       <article class="card" id="infra">
         <h2>Infrastructure</h2>
-        <p class="plain">Plain words: We create cloud infrastructure that can reliably run the website.</p>
-        <details>
-          <summary>Technical details</summary>
-          <ul>
-            <li>Terraform provisions GKE cluster <code>small-gke</code> in <code>us-central1-a</code>.</li>
-            <li>Node config uses <code>e2-small</code> and preemptible instances to reduce cost.</li>
-            <li>Provider settings and outputs are managed in <code>main.tf</code>, <code>variables.tf</code>, and <code>outputs.tf</code>.</li>
-          </ul>
-        </details>
-        <p class="links">
-          Links:
+        <p class="plain">Cloud setup is automated and repeatable.</p>
+        <p class="tech">Tech: <code>small-gke</code> in <code>us-central1-a</code>, created by Terraform with cost-focused nodes.</p>
+        <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/infra/terraform/gke.tf" target="_blank" rel="noopener noreferrer">gke.tf</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/infra/terraform/main.tf" target="_blank" rel="noopener noreferrer">main.tf</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/infra/terraform/outputs.tf" target="_blank" rel="noopener noreferrer">outputs.tf</a>
-        </p>
+        </div>
       </article>
 
       <article class="card" id="app">
         <h2>Application</h2>
-        <p class="plain">Plain words: The app is a lightweight static website served by NGINX in a container.</p>
-        <details>
-          <summary>Technical details</summary>
-          <ul>
-            <li>Docker image is based on <code>nginx:alpine</code>.</li>
-            <li><code>index.html</code> is the home page, and <code>solution.html</code> is the architecture guide.</li>
-            <li>Container build-time metadata is baked into both pages at image build.</li>
-          </ul>
-        </details>
-        <p class="links">
-          Links:
+        <p class="plain">A lightweight static site runs inside an NGINX container.</p>
+        <p class="tech">Tech: built from <code>nginx:alpine</code>; build metadata is injected at image build time.</p>
+        <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/Dockerfile" target="_blank" rel="noopener noreferrer">Dockerfile</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/index.html" target="_blank" rel="noopener noreferrer">index.html</a>
           <a href="https://github.com/SNKD92/k8s/tree/main/app/helloworld" target="_blank" rel="noopener noreferrer">app folder</a>
-        </p>
+        </div>
       </article>
 
       <article class="card" id="k8s">
-        <h2>Kubernetes Deployment</h2>
-        <p class="plain">Plain words: Kubernetes keeps the app running and exposes it to internet users.</p>
-        <details>
-          <summary>Technical details</summary>
-          <ul>
-            <li>Deployment runs 3 replicas for availability.</li>
-            <li>Service exposes internal port 80 via <code>ClusterIP</code>.</li>
-            <li>Ingress routes domain traffic to the service and attaches TLS cert secret.</li>
-          </ul>
-        </details>
-        <p class="links">
-          Links:
+        <h2>Kubernetes</h2>
+        <p class="plain">Kubernetes keeps service uptime and routes traffic.</p>
+        <p class="tech">Tech: deployment replicas + ClusterIP service + ingress with TLS termination.</p>
+        <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/deployment.yaml" target="_blank" rel="noopener noreferrer">deployment.yaml</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/service.yaml" target="_blank" rel="noopener noreferrer">service.yaml</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/ingress.yaml" target="_blank" rel="noopener noreferrer">ingress.yaml</a>
-        </p>
+        </div>
       </article>
 
       <article class="card" id="cert">
-        <h2>cert-manager and HTTPS</h2>
-        <p class="plain">Plain words: SSL certificates are issued automatically so the site is always on HTTPS.</p>
-        <details>
-          <summary>Technical details</summary>
-          <ul>
-            <li>ClusterIssuer uses Let&apos;s Encrypt ACME production endpoint.</li>
-            <li>DNS-01 challenge is solved through Cloudflare using <code>cloudflare-api-token-secret</code>.</li>
-            <li>Certificate resource requests cert for <code>deniskachar.com</code> into <code>deniskachar-com-tls</code>.</li>
-          </ul>
-        </details>
-        <p class="links">
-          Links:
+        <h2>cert-manager</h2>
+        <p class="plain">HTTPS certificates are issued and renewed automatically.</p>
+        <p class="tech">Tech: Let&apos;s Encrypt ACME + Cloudflare DNS challenge, stored in <code>deniskachar-com-tls</code>.</p>
+        <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/cert-manager/clusterissuer.yaml" target="_blank" rel="noopener noreferrer">clusterissuer.yaml</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/cert-manager/certificate.yaml" target="_blank" rel="noopener noreferrer">certificate.yaml</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/cert-manager/cloudflare-secret.yaml" target="_blank" rel="noopener noreferrer">cloudflare-secret.yaml</a>
-        </p>
+        </div>
       </article>
 
       <article class="card" id="cicd">
-        <h2>CI/CD Pipeline</h2>
-        <p class="plain">Plain words: Every push to main can build, publish, and deploy the latest version automatically.</p>
-        <details>
-          <summary>Technical details</summary>
-          <ul>
-            <li>GitHub Actions workflow builds Docker image with version tag and <code>latest</code>.</li>
-            <li>Image is pushed to Docker Hub with repository secrets.</li>
-            <li>Workflow gets GKE credentials and updates deployment image using <code>kubectl set image</code>.</li>
-          </ul>
-        </details>
-        <p class="links">
-          Links:
+        <h2>CI/CD</h2>
+        <p class="plain">Push to <code>main</code> can publish and deploy automatically.</p>
+        <p class="tech">Tech: build and push image tags, authenticate to GCP, then run <code>kubectl set image</code>.</p>
+        <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener noreferrer">deploy.yml</a>
-          <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/deployment.yaml" target="_blank" rel="noopener noreferrer">deployment image target</a>
-        </p>
+          <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/deployment.yaml" target="_blank" rel="noopener noreferrer">deployment target</a>
+        </div>
       </article>
 
       <article class="card" id="security">
         <h2>Identity and Secrets</h2>
-        <p class="plain">Plain words: Access is controlled using short-lived identity tokens instead of long-lived keys.</p>
-        <details>
-          <summary>Technical details</summary>
-          <ul>
-            <li>Terraform creates Workload Identity Pool and Provider for GitHub OIDC federation.</li>
-            <li>GitHub workflow requests OIDC token and impersonates service account for deployment actions.</li>
-            <li>Cloudflare and Docker credentials are stored as secrets outside Git source code.</li>
-          </ul>
-        </details>
-        <p class="links">
-          Links:
+        <p class="plain">Access is short-lived and keyless by design.</p>
+        <p class="tech">Tech: GitHub OIDC federation + Workload Identity; credentials remain in secret managers.</p>
+        <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/infra/terraform/sa.tf" target="_blank" rel="noopener noreferrer">sa.tf</a>
-          <a href="https://github.com/SNKD92/k8s/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener noreferrer">workflow auth step</a>
-        </p>
-      </article>
-
-      <article class="card" id="flow">
-        <h2>End-to-End Delivery Flow</h2>
-        <p class="plain">Plain words: This is the sequence from infrastructure to live production updates.</p>
-        <details open>
-          <summary>Technical details</summary>
-          <ol>
-            <li>Terraform provisions GKE and IAM/OIDC resources.</li>
-            <li>cert-manager and certificate objects are applied.</li>
-            <li>App deployment, service, and ingress are created in Kubernetes.</li>
-            <li>Push to <code>main</code> triggers build and deploy pipeline.</li>
-            <li>Ingress serves the new version over HTTPS on <code>deniskachar.com</code>.</li>
-          </ol>
-        </details>
-        <p class="links">
-          Links:
-          <a href="https://github.com/SNKD92/k8s/blob/main/README.MD" target="_blank" rel="noopener noreferrer">deployment guide</a>
-          <a href="https://github.com/SNKD92/k8s/tree/main/k8s" target="_blank" rel="noopener noreferrer">k8s manifests</a>
-        </p>
+          <a href="https://github.com/SNKD92/k8s/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener noreferrer">auth in workflow</a>
+        </div>
       </article>
     </section>
 
-    <p class="footer">NENMP architecture summary for both business and engineering readers.</p>
+    <section class="flow" id="flow">
+      <h2>Release Flow</h2>
+      <div class="steps">
+        <div class="step"><span>1</span>Terraform Infra</div>
+        <div class="step"><span>2</span>Apply TLS Setup</div>
+        <div class="step"><span>3</span>Deploy K8s App</div>
+        <div class="step"><span>4</span>Push to Main</div>
+        <div class="step"><span>5</span>Auto Rollout</div>
+      </div>
+      <div class="links" style="margin-top: 10px;">
+        <a href="https://github.com/SNKD92/k8s/blob/main/README.MD" target="_blank" rel="noopener noreferrer">deployment guide</a>
+        <a href="https://github.com/SNKD92/k8s/tree/main/k8s" target="_blank" rel="noopener noreferrer">k8s manifests</a>
+      </div>
+    </section>
+
+    <p class="footer">NENMP architecture summary for business and engineering readers.</p>
   </main>
 </body>
 </html>
