@@ -1,86 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Denis Kachar</title>
+<div class="container">
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
+  <h1>🚀 HELLO WORLD — VERSION 2 🚀</h1>
 
-    .container {
-      text-align: center;
-      background: rgba(30, 41, 59, 0.7);
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-      backdrop-filter: blur(10px);
-    }
+  <p style="font-size: 1.4rem; color: #22c55e;">
+    ✅ This is the UPDATED container running from Docker Hub!
+  </p>
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      color: #38bdf8;
-    }
+  <p id="timestamp" style="color: #facc15; font-weight: bold;"></p>
 
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-      color: #cbd5f5;
-    }
-
-    a {
-      display: inline-block;
-      text-decoration: none;
-      color: white;
-      background: #0ea5e9;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
-
-    a:hover {
-      background: #0284c7;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(14,165,233,0.4);
-    }
-
-    .footer {
-      margin-top: 25px;
-      font-size: 0.9rem;
-      color: #94a3b8;
-    }
-  </style>
-
-</head>
-<body>
-
-  <div class="container">
-    <h1>Hello, I'm Denis Kachar</h1>
-
-    <p>
-      This page is running on my Kubernetes cluster deployed with Terraform, GKE, cert-manager, and Cloudflare.
-    </p>
-
-    <a href="https://www.linkedin.com/in/deniskachar/" target="_blank">
-      View my LinkedIn
-    </a>
-
-    <div class="footer">
-      Hosted on Kubernetes • TLS secured with Let's Encrypt
-    </div>
+  <div style="
+      margin-top:20px;
+      padding:10px;
+      background:#ef4444;
+      border-radius:8px;
+      font-weight:bold;
+      animation: pulse 1s infinite;">
+      🔥 NEW VERSION DEPLOYED 🔥
   </div>
 
-</body>
-</html>
+  <div class="footer">
+    Version: v2 • Kubernetes Rollout Test
+  </div>
+
+</div>
+
+<script>
+  const now = new Date();
+  document.getElementById("timestamp").innerText =
+    "Container built at: " + now.toLocaleString();
+</script>
+
+<style>
+@keyframes pulse {
+  0% {opacity:1;}
+  50% {opacity:0.4;}
+  100% {opacity:1;}
+}
+</style>
