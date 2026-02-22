@@ -285,7 +285,7 @@
       margin-top: 12px;
       position: relative;
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -305,50 +305,19 @@
       background: rgba(5, 14, 29, 0.62);
       border: 1px solid rgba(125, 211, 252, 0.22);
       border-radius: 10px;
-      padding: 28px 10px 10px;
-    }
-
-    .phase-index {
-      position: absolute;
-      left: 10px;
-      top: -9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: rgba(52, 211, 153, 0.2);
-      color: var(--good);
-      font-weight: 800;
-      font-size: 0.78rem;
-      border: 1px solid rgba(52, 211, 153, 0.45);
+      padding: 12px 10px 10px;
     }
 
     .phase-title {
       margin: 0;
       color: var(--text);
-      font-size: 0.83rem;
+      font-size: 0.86rem;
       font-weight: 700;
-    }
-
-    .phase-cmd {
-      margin: 6px 0 0;
-      font-size: 0.8rem;
-    }
-
-    .phase-cmd code {
-      display: inline-block;
-      width: 100%;
-      padding: 5px 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .phase-note {
       margin: 6px 0 0;
-      font-size: 0.74rem;
+      font-size: 0.78rem;
       line-height: 1.35;
       color: var(--muted);
     }
@@ -423,15 +392,15 @@
 
     <section class="glance">
       <article class="glance-card">
-        <h2>1 Cloud Base</h2>
+        <h2>Cloud Base</h2>
         <p>Terraform provisions GKE and IAM foundations.</p>
       </article>
       <article class="glance-card">
-        <h2>2 App Delivery</h2>
+        <h2>App Delivery</h2>
         <p>GitHub Actions builds, tags, pushes, and rolls out.</p>
       </article>
       <article class="glance-card">
-        <h2>3 Secure Access</h2>
+        <h2>Secure Access</h2>
         <p>OIDC + secret stores avoid long-lived keys in code.</p>
       </article>
     </section>
@@ -521,41 +490,27 @@
     </section>
 
     <section class="flow" id="flow">
-      <h2>Release Flow (Real Sequence)</h2>
-      <p class="flow-intro">This is the actual order used in this repo and deployment pipeline.</p>
+      <h2>Release Flow</h2>
+      <p class="flow-intro">Compact interview view of how changes become live.</p>
       <figure class="diagram">
-        <img src="/diagrams/release-flow.svg" alt="Release flow diagram from Terraform setup to GitHub Actions rollout." loading="lazy">
+        <img src="/diagrams/release-flow.svg" alt="Release flow diagram from code update to live HTTPS deployment." loading="lazy">
       </figure>
       <div class="timeline">
         <article class="phase">
-          <span class="phase-index">1</span>
-          <h3 class="phase-title">Infra baseline</h3>
-          <p class="phase-cmd"><code>terraform apply</code></p>
-          <p class="phase-note">Used when cluster/IAM config changes.</p>
+          <h3 class="phase-title">Infrastructure Ready</h3>
+          <p class="phase-note">Cluster, network, and identity are already in place.</p>
         </article>
         <article class="phase">
-          <span class="phase-index">2</span>
-          <h3 class="phase-title">TLS and DNS challenge</h3>
-          <p class="phase-cmd"><code>kubectl apply -f k8s/cert-manager/</code></p>
-          <p class="phase-note">Certificate is issued and stored as ingress secret.</p>
+          <h3 class="phase-title">Change in Main</h3>
+          <p class="phase-note">A push triggers the deployment workflow automatically.</p>
         </article>
         <article class="phase">
-          <span class="phase-index">3</span>
-          <h3 class="phase-title">App manifests live</h3>
-          <p class="phase-cmd"><code>kubectl apply -f k8s/app/</code></p>
-          <p class="phase-note">Deployment + service + ingress become active.</p>
+          <h3 class="phase-title">Fresh Build + Deploy</h3>
+          <p class="phase-note">New image is built, published, and rolled out to Kubernetes.</p>
         </article>
         <article class="phase">
-          <span class="phase-index">4</span>
-          <h3 class="phase-title">Delivery trigger</h3>
-          <p class="phase-cmd"><code>git push origin main</code></p>
-          <p class="phase-note">Push starts <code>.github/workflows/deploy.yml</code>.</p>
-        </article>
-        <article class="phase">
-          <span class="phase-index">5</span>
-          <h3 class="phase-title">Rolling update</h3>
-          <p class="phase-cmd"><code>kubectl rollout status deployment/helloworld-deployment</code></p>
-          <p class="phase-note">Pipeline completes only after rollout is healthy.</p>
+          <h3 class="phase-title">Healthy Live Traffic</h3>
+          <p class="phase-note">Rollout checks pass and users continue on secure HTTPS.</p>
         </article>
       </div>
       <div class="links" style="margin-top: 10px;">

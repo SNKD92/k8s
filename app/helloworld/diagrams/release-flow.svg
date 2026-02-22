@@ -14,34 +14,29 @@
   </defs>
   <rect width="960" height="330" fill="url(#bg)"/>
   <text x="28" y="38" fill="#7dd3fc" font-family="Manrope, Arial" font-size="22" font-weight="700">Release Flow Picture + Diagram</text>
-  <text x="28" y="62" fill="#b6c5dd" font-family="Manrope, Arial" font-size="14">From infrastructure prep to automated rollout validation.</text>
+  <text x="28" y="62" fill="#b6c5dd" font-family="Manrope, Arial" font-size="14">Compact view for interview walkthroughs.</text>
 
-  <rect x="28" y="110" width="160" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="44" y="144" fill="#e8f0ff" font-size="14" font-family="Manrope, Arial" font-weight="700">1 Terraform</text>
-  <text x="44" y="166" fill="#b6c5dd" font-size="11" font-family="Manrope, Arial">terraform apply</text>
+  <rect x="36" y="112" width="205" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="58" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Infrastructure Ready</text>
+  <text x="58" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Cluster and identity prepared</text>
 
-  <rect x="214" y="110" width="160" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="230" y="144" fill="#e8f0ff" font-size="14" font-family="Manrope, Arial" font-weight="700">2 TLS Setup</text>
-  <text x="230" y="166" fill="#b6c5dd" font-size="11" font-family="Manrope, Arial">kubectl apply certs</text>
+  <rect x="268" y="112" width="205" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="290" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Change in Main</text>
+  <text x="290" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Workflow starts automatically</text>
 
-  <rect x="400" y="110" width="160" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="416" y="144" fill="#e8f0ff" font-size="14" font-family="Manrope, Arial" font-weight="700">3 App Manifests</text>
-  <text x="416" y="166" fill="#b6c5dd" font-size="11" font-family="Manrope, Arial">kubectl apply app</text>
+  <rect x="500" y="112" width="205" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="522" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Fresh Build + Deploy</text>
+  <text x="522" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Container refreshes in cluster</text>
 
-  <rect x="586" y="110" width="160" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="602" y="144" fill="#e8f0ff" font-size="14" font-family="Manrope, Arial" font-weight="700">4 Push Main</text>
-  <text x="602" y="166" fill="#b6c5dd" font-size="11" font-family="Manrope, Arial">git push origin main</text>
+  <rect x="732" y="112" width="192" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="754" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Healthy Live Site</text>
+  <text x="754" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Traffic stays on HTTPS</text>
 
-  <rect x="772" y="110" width="160" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="788" y="144" fill="#e8f0ff" font-size="14" font-family="Manrope, Arial" font-weight="700">5 Rollout</text>
-  <text x="788" y="166" fill="#b6c5dd" font-size="11" font-family="Manrope, Arial">kubectl rollout status</text>
+  <line x1="241" y1="158" x2="258" y2="158" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="473" y1="158" x2="490" y2="158" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="705" y1="158" x2="722" y2="158" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
 
-  <line x1="188" y1="156" x2="206" y2="156" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="374" y1="156" x2="392" y2="156" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="560" y1="156" x2="578" y2="156" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="746" y1="156" x2="764" y2="156" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
-
-  <rect x="28" y="236" width="904" height="64" rx="12" fill="#0a2140" stroke="#22d3ee"/>
-  <text x="46" y="264" fill="#e8f0ff" font-size="13" font-family="Manrope, Arial" font-weight="700">Outcome</text>
-  <text x="46" y="285" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">New container image is live behind HTTPS on deniskachar.com after health-checked rollout.</text>
+  <rect x="36" y="236" width="888" height="66" rx="12" fill="#0a2140" stroke="#22d3ee"/>
+  <text x="58" y="265" fill="#e8f0ff" font-size="13" font-family="Manrope, Arial" font-weight="700">Interview summary</text>
+  <text x="58" y="286" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Automation keeps releases consistent, secure, and low-friction from commit to production.</text>
 </svg>
