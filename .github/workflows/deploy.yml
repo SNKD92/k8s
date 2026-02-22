@@ -83,13 +83,21 @@ jobs:
 
 
     # -----------------------------
+    # Install GKE auth plugin (REQUIRED)
+    # -----------------------------
+    - name: Install GKE auth plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin --quiet
+
+
+    # -----------------------------
     # Get GKE credentials
     # -----------------------------
     - name: Get GKE credentials
       run: |
-        gcloud container clusters get-credentials small-gke \
-          --zone us-central1-a \
-          --project project-e7b71f6e-c56d-438f-a7e
+        gcloud container clusters get-credentials $CLUSTER_NAME \
+          --zone $CLUSTER_ZONE \
+          --project $PROJECT_ID
 
 
     # -----------------------------
