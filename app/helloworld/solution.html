@@ -35,7 +35,7 @@
     }
 
     .container {
-      width: min(1080px, calc(100% - 32px));
+      width: min(860px, calc(100% - 32px));
       margin: 28px auto 40px;
     }
 
@@ -97,7 +97,7 @@
       margin-top: 18px;
       display: grid;
       gap: 14px;
-      grid-template-columns: repeat(12, 1fr);
+      grid-template-columns: 1fr;
     }
 
     .card {
@@ -112,14 +112,6 @@
       margin: 0 0 12px;
       font-size: 1.1rem;
       color: var(--accent);
-    }
-
-    .col-6 {
-      grid-column: span 6;
-    }
-
-    .col-12 {
-      grid-column: span 12;
     }
 
     ul {
@@ -138,22 +130,6 @@
       font-size: 0.9em;
     }
 
-    .chips {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      background: var(--chip);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 0.78rem;
-    }
-
     .flow {
       margin: 0;
       padding-left: 20px;
@@ -169,12 +145,6 @@
       color: var(--muted);
       font-size: 0.9rem;
       text-align: center;
-    }
-
-    @media (max-width: 900px) {
-      .col-6 {
-        grid-column: span 12;
-      }
     }
 
     @media (max-width: 640px) {
@@ -206,108 +176,68 @@
     </section>
 
     <section class="grid">
-      <article class="card col-6">
+      <article class="card">
         <h2>Infrastructure (Terraform / GKE)</h2>
         <ul>
-          <li><code>infra/terraform/gke.tf</code> creates a GKE cluster <code>small-gke</code> in <code>us-central1-a</code>.</li>
-          <li>Node profile is optimized for low cost: <code>e2-small</code>, preemptible nodes, and IP aliasing enabled.</li>
-          <li><code>infra/terraform/main.tf</code> configures Google provider with project, region, and zone variables.</li>
-          <li><code>infra/terraform/outputs.tf</code> exports cluster name/zone and GitHub Actions service account email.</li>
+          <li><code>infra/terraform/gke.tf</code> provisions cluster <code>small-gke</code> in <code>us-central1-a</code>.</li>
+          <li>Current node profile is cost-focused: <code>e2-small</code>, preemptible, with IP allocation enabled.</li>
+          <li><code>main.tf</code>, <code>variables.tf</code>, and <code>outputs.tf</code> keep core project/cluster config together.</li>
         </ul>
-        <div class="chips">
-          <span class="chip">Terraform</span>
-          <span class="chip">Google Cloud</span>
-          <span class="chip">GKE</span>
-        </div>
       </article>
 
-      <article class="card col-6">
+      <article class="card">
         <h2>App Layer (Container + Runtime)</h2>
         <ul>
-          <li><code>app/helloworld/Dockerfile</code> builds a lightweight NGINX container from <code>nginx:alpine</code>.</li>
-          <li>Static pages are served from <code>/usr/share/nginx/html</code> with UTF-8 enabled.</li>
-          <li><code>app/helloworld/index.html</code> is the landing page.</li>
-          <li><code>app/helloworld/solution.html</code> (this page) documents architecture and deployment flow.</li>
+          <li><code>app/helloworld/Dockerfile</code> builds a small <code>nginx:alpine</code> image.</li>
+          <li>NGINX serves static content from <code>/usr/share/nginx/html</code> with UTF-8 enabled.</li>
+          <li><code>index.html</code> is the home page and <code>solution.html</code> is the technical overview page.</li>
         </ul>
-        <div class="chips">
-          <span class="chip">Docker</span>
-          <span class="chip">NGINX</span>
-          <span class="chip">Static HTML</span>
-        </div>
       </article>
 
-      <article class="card col-6">
+      <article class="card">
         <h2>Kubernetes Deployment</h2>
         <ul>
-          <li><code>k8s/app/deployment.yaml</code> runs 3 replicas of <code>snkd92/helloworld:latest</code>.</li>
-          <li><code>k8s/app/service.yaml</code> exposes pods internally via <code>ClusterIP</code> on port 80.</li>
-          <li><code>k8s/app/ingress.yaml</code> routes external HTTPS traffic for <code>deniskachar.com</code>.</li>
-          <li>TLS secret used by ingress: <code>deniskachar-com-tls</code>.</li>
+          <li><code>k8s/app/deployment.yaml</code> runs 3 replicas of the app container.</li>
+          <li><code>k8s/app/service.yaml</code> exposes pods internally on port 80 via <code>ClusterIP</code>.</li>
+          <li><code>k8s/app/ingress.yaml</code> routes <code>deniskachar.com</code> to the service with TLS.</li>
         </ul>
-        <div class="chips">
-          <span class="chip">Kubernetes</span>
-          <span class="chip">Ingress</span>
-          <span class="chip">Rolling Update</span>
-        </div>
       </article>
 
-      <article class="card col-6">
+      <article class="card">
         <h2>cert-manager + TLS</h2>
         <ul>
-          <li><code>k8s/cert-manager/clusterissuer.yaml</code> defines <code>letsencrypt-cloudflare</code>.</li>
-          <li>ACME server: Let&apos;s Encrypt production endpoint.</li>
-          <li>DNS-01 challenge is solved through Cloudflare API token secret:
-            <code>cloudflare-api-token-secret</code> in namespace <code>cert-manager</code>.</li>
-          <li><code>k8s/cert-manager/certificate.yaml</code> requests cert for <code>deniskachar.com</code>.</li>
+          <li><code>clusterissuer.yaml</code> defines <code>letsencrypt-cloudflare</code> using Let&apos;s Encrypt ACME.</li>
+          <li>Domain validation uses Cloudflare DNS-01 and secret <code>cloudflare-api-token-secret</code>.</li>
+          <li><code>certificate.yaml</code> requests the cert and stores it in <code>deniskachar-com-tls</code>.</li>
         </ul>
-        <div class="chips">
-          <span class="chip">cert-manager</span>
-          <span class="chip">Let's Encrypt</span>
-          <span class="chip">Cloudflare DNS-01</span>
-        </div>
       </article>
 
-      <article class="card col-6">
+      <article class="card">
         <h2>CI/CD Pipeline (GitHub Actions)</h2>
         <ul>
-          <li><code>.github/workflows/deploy.yml</code> triggers on pushes to <code>main</code>.</li>
-          <li>Builds image with a timestamp tag and also updates <code>latest</code>.</li>
-          <li>Pushes to Docker Hub using repository secrets <code>DOCKER_USERNAME</code> and <code>DOCKER_PASSWORD</code>.</li>
-          <li>Authenticates to GCP through Workload Identity Federation (OIDC) without static SA key files.</li>
-          <li>Updates GKE deployment image and waits for rollout completion.</li>
+          <li><code>.github/workflows/deploy.yml</code> runs on pushes to <code>main</code>.</li>
+          <li>It builds the image, pushes timestamp + <code>latest</code> tags to Docker Hub, then deploys to GKE.</li>
+          <li>Deployment step updates the image in Kubernetes and waits for rollout status.</li>
         </ul>
-        <div class="chips">
-          <span class="chip">GitHub Actions</span>
-          <span class="chip">OIDC</span>
-          <span class="chip">Workload Identity</span>
-        </div>
       </article>
 
-      <article class="card col-6">
+      <article class="card">
         <h2>Identity and Secret Management</h2>
         <ul>
-          <li><code>infra/terraform/sa.tf</code> creates service account <code>github-actions</code> and WIF pool/provider.</li>
-          <li>Repository scope is restricted to <code>SNKD92/k8s</code> for federated identity.</li>
-          <li>Cloudflare token is restored from GCP Secret Manager into Kubernetes secret at deploy time.</li>
-          <li>Docker Hub password source of truth is GCP Secret Manager secret:
-            <code>projects/365212276900/secrets/githubactionssecret</code>.</li>
+          <li><code>infra/terraform/sa.tf</code> creates GitHub Actions service account + Workload Identity federation.</li>
+          <li>GCP auth uses OIDC, so there is no static service-account key in the repo.</li>
+          <li>Cloudflare and Docker credentials are managed through secrets, not committed files.</li>
         </ul>
-        <div class="chips">
-          <span class="chip">IAM</span>
-          <span class="chip">Secret Manager</span>
-          <span class="chip">Least Privilege</span>
-        </div>
       </article>
 
-      <article class="card col-12">
+      <article class="card">
         <h2>End-to-End Deployment Flow</h2>
         <ol class="flow">
-          <li>Terraform provisions GKE + GitHub OIDC federation resources.</li>
-          <li>cert-manager is installed and configured with Cloudflare DNS challenge.</li>
-          <li>Certificate for <code>deniskachar.com</code> is issued and stored in <code>deniskachar-com-tls</code>.</li>
-          <li>GitHub Actions builds and pushes a new Docker image.</li>
-          <li>Workflow updates Kubernetes deployment image and verifies rollout status.</li>
-          <li>Ingress serves HTTPS traffic to the updated application.</li>
+          <li>Provision infrastructure with Terraform (GKE + IAM/WIF resources).</li>
+          <li>Install cert-manager and apply issuer/certificate manifests.</li>
+          <li>Deploy app manifests (deployment, service, ingress).</li>
+          <li>Push to <code>main</code> to trigger build-and-deploy workflow.</li>
+          <li>Ingress serves the updated app over HTTPS on <code>deniskachar.com</code>.</li>
         </ol>
       </article>
     </section>
