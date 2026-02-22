@@ -4,8 +4,16 @@ FROM nginx:alpine
 # Remove default nginx static files
 RUN rm -rf /usr/share/nginx/html/*
 
+# Optional build-time override (set from CI)
+ARG BUILD_TIME_UTC=auto
+
 # Copy static pages
 COPY index.html solution.html /usr/share/nginx/html/
+
+# Inject image build time into static pages
+RUN BUILD_TS="$BUILD_TIME_UTC"; \
+    if [ "$BUILD_TS" = "auto" ]; then BUILD_TS="$(date -u +"%Y-%m-%d %H:%M:%S UTC")"; fi; \
+    sed -i "s|__BUILD_TIME_UTC__|$BUILD_TS|g" /usr/share/nginx/html/index.html /usr/share/nginx/html/solution.html
 
 # Ensure nginx serves UTF-8 encoding
 RUN printf "server {\n\
