@@ -39,6 +39,10 @@
       line-height: 1.58;
     }
 
+    body.lightbox-open {
+      overflow: hidden;
+    }
+
     .container {
       width: min(980px, calc(100% - 26px));
       margin: 24px auto 36px;
@@ -247,7 +251,7 @@
     }
 
     .diagram-link::after {
-      content: "Open full size";
+      content: "Click to enlarge";
       position: absolute;
       right: 10px;
       bottom: 10px;
@@ -361,6 +365,71 @@
       text-align: center;
     }
 
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: none;
+    }
+
+    .lightbox.open {
+      display: block;
+    }
+
+    .lightbox__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 7, 18, 0.85);
+      backdrop-filter: blur(3px);
+    }
+
+    .lightbox__panel {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(1200px, calc(100% - 20px));
+      max-height: calc(100vh - 20px);
+      background: rgba(5, 14, 29, 0.96);
+      border: 1px solid rgba(125, 211, 252, 0.34);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      overflow: auto;
+    }
+
+    .lightbox__close {
+      position: sticky;
+      top: 0;
+      margin-left: auto;
+      display: block;
+      border: 1px solid rgba(125, 211, 252, 0.45);
+      background: rgba(9, 26, 50, 0.9);
+      color: var(--text);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .lightbox__img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(125, 211, 252, 0.25);
+    }
+
+    .lightbox__caption {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-align: center;
+    }
+
     @media (max-width: 900px) {
       .glance {
         grid-template-columns: 1fr;
@@ -439,7 +508,7 @@
         <p class="plain">Cloud setup is automated and repeatable.</p>
         <p class="tech">Tech: <code>small-gke</code> in <code>us-central1-a</code>, created by Terraform with cost-focused nodes.</p>
         <figure class="diagram">
-          <a class="diagram-link" href="/diagrams/infrastructure.svg" target="_blank" rel="noopener noreferrer">
+          <a class="diagram-link" href="/diagrams/infrastructure.svg">
             <img src="/diagrams/infrastructure.svg" alt="Infrastructure diagram showing Terraform creating IAM and GKE resources in Google Cloud." loading="lazy">
           </a>
           <figcaption>Terraform to GKE infrastructure map.</figcaption>
@@ -456,7 +525,7 @@
         <p class="plain">A lightweight static site runs inside an NGINX container.</p>
         <p class="tech">Tech: built from <code>nginx:alpine</code>; build metadata is injected at image build time.</p>
         <figure class="diagram">
-          <a class="diagram-link" href="/diagrams/application.svg" target="_blank" rel="noopener noreferrer">
+          <a class="diagram-link" href="/diagrams/application.svg">
             <img src="/diagrams/application.svg" alt="Application diagram showing static pages served by an NGINX container." loading="lazy">
           </a>
           <figcaption>NGINX static app layout.</figcaption>
@@ -473,7 +542,7 @@
         <p class="plain">Kubernetes keeps service uptime and routes traffic.</p>
         <p class="tech">Tech: deployment replicas + ClusterIP service + ingress with TLS termination.</p>
         <figure class="diagram">
-          <a class="diagram-link" href="/diagrams/kubernetes.svg" target="_blank" rel="noopener noreferrer">
+          <a class="diagram-link" href="/diagrams/kubernetes.svg">
             <img src="/diagrams/kubernetes.svg" alt="Kubernetes diagram showing ingress, service, and replicated pods." loading="lazy">
           </a>
           <figcaption>Ingress to service to pods traffic path.</figcaption>
@@ -490,7 +559,7 @@
         <p class="plain">HTTPS certificates are issued and renewed automatically.</p>
         <p class="tech">Tech: Let&apos;s Encrypt ACME + Cloudflare DNS challenge, stored in <code>deniskachar-com-tls</code>.</p>
         <figure class="diagram">
-          <a class="diagram-link" href="/diagrams/cert-manager.svg" target="_blank" rel="noopener noreferrer">
+          <a class="diagram-link" href="/diagrams/cert-manager.svg">
             <img src="/diagrams/cert-manager.svg" alt="Certificate management diagram showing Cert-Manager, Let's Encrypt, and Cloudflare DNS challenge." loading="lazy">
           </a>
           <figcaption>Automated certificate issuance flow.</figcaption>
@@ -507,7 +576,7 @@
         <p class="plain">Push to <code>main</code> can publish and deploy automatically.</p>
         <p class="tech">Tech: build and push image tags, authenticate to GCP, then run <code>kubectl set image</code>.</p>
         <figure class="diagram">
-          <a class="diagram-link" href="/diagrams/cicd.svg" target="_blank" rel="noopener noreferrer">
+          <a class="diagram-link" href="/diagrams/cicd.svg">
             <img src="/diagrams/cicd.svg" alt="CI/CD diagram showing GitHub Actions building and deploying to Kubernetes." loading="lazy">
           </a>
           <figcaption>From commit to rollout automation.</figcaption>
@@ -523,7 +592,7 @@
         <p class="plain">Access is short-lived and keyless by design.</p>
         <p class="tech">Tech: GitHub OIDC federation + Workload Identity; credentials remain in secret managers.</p>
         <figure class="diagram">
-          <a class="diagram-link" href="/diagrams/identity.svg" target="_blank" rel="noopener noreferrer">
+          <a class="diagram-link" href="/diagrams/identity.svg">
             <img src="/diagrams/identity.svg" alt="Identity diagram showing GitHub OIDC tokens exchanged for short-lived Google credentials." loading="lazy">
           </a>
           <figcaption>Keyless auth and secret boundaries.</figcaption>
@@ -539,7 +608,7 @@
       <h2>Release Flow</h2>
       <p class="flow-intro">Compact interview view of how changes become live.</p>
       <figure class="diagram">
-        <a class="diagram-link" href="/diagrams/release-flow.svg" target="_blank" rel="noopener noreferrer">
+        <a class="diagram-link" href="/diagrams/release-flow.svg">
           <img src="/diagrams/release-flow.svg" alt="Release flow diagram from code update to live HTTPS deployment." loading="lazy">
         </a>
         <figcaption>High-level release journey.</figcaption>
@@ -571,6 +640,14 @@
 
     <p class="footer">NENMP architecture summary for business and engineering readers.</p>
   </main>
+  <div class="lightbox" id="diagram-lightbox" aria-hidden="true">
+    <div class="lightbox__backdrop" data-close-lightbox="true"></div>
+    <div class="lightbox__panel" role="dialog" aria-modal="true" aria-label="Diagram viewer">
+      <button class="lightbox__close" id="lightbox-close" type="button" aria-label="Close diagram viewer">Close</button>
+      <img class="lightbox__img" id="lightbox-image" src="" alt="">
+      <p class="lightbox__caption" id="lightbox-caption"></p>
+    </div>
+  </div>
   <script>
     (function renderBuildTime() {
       var buildIso = "__BUILD_TIME_ISO__";
@@ -581,6 +658,56 @@
         return;
       }
       buildTimeEl.innerText = buildDate.toLocaleString();
+    })();
+
+    (function initDiagramLightbox() {
+      var lightbox = document.getElementById("diagram-lightbox");
+      var closeBtn = document.getElementById("lightbox-close");
+      var lightboxImage = document.getElementById("lightbox-image");
+      var lightboxCaption = document.getElementById("lightbox-caption");
+      var diagramLinks = document.querySelectorAll(".diagram-link");
+
+      function closeLightbox() {
+        lightbox.classList.remove("open");
+        lightbox.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("lightbox-open");
+        lightboxImage.removeAttribute("src");
+        lightboxImage.removeAttribute("alt");
+        lightboxCaption.innerText = "";
+      }
+
+      function openLightbox(src, alt, caption) {
+        lightboxImage.src = src;
+        lightboxImage.alt = alt || "Diagram preview";
+        lightboxCaption.innerText = caption || "";
+        lightbox.classList.add("open");
+        lightbox.setAttribute("aria-hidden", "false");
+        document.body.classList.add("lightbox-open");
+      }
+
+      diagramLinks.forEach(function (link) {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          var image = link.querySelector("img");
+          var figure = link.closest("figure");
+          var captionEl = figure ? figure.querySelector("figcaption") : null;
+          openLightbox(link.getAttribute("href"), image ? image.getAttribute("alt") : "", captionEl ? captionEl.innerText : "");
+        });
+      });
+
+      closeBtn.addEventListener("click", closeLightbox);
+
+      lightbox.addEventListener("click", function (event) {
+        if (event.target && event.target.getAttribute("data-close-lightbox") === "true") {
+          closeLightbox();
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && lightbox.classList.contains("open")) {
+          closeLightbox();
+        }
+      });
     })();
   </script>
 </body>
