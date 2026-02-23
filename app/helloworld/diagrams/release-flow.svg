@@ -13,24 +13,24 @@
     </marker>
   </defs>
   <rect width="960" height="330" fill="url(#bg)"/>
-  <text x="28" y="38" fill="#7dd3fc" font-family="Manrope, Arial" font-size="22" font-weight="700">Release Flow Picture + Diagram</text>
-  <text x="28" y="62" fill="#b6c5dd" font-family="Manrope, Arial" font-size="14">Compact view for interview walkthroughs.</text>
+  <text x="28" y="38" fill="#7dd3fc" font-family="Manrope, Arial" font-size="22" font-weight="700">Release Lifecycle Diagram</text>
+  <text x="28" y="62" fill="#b6c5dd" font-family="Manrope, Arial" font-size="14">Interview-friendly path from update to verified deployment.</text>
 
   <rect x="36" y="112" width="205" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="58" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Infrastructure Ready</text>
-  <text x="58" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Cluster and identity prepared</text>
+  <text x="58" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Platform Prepared</text>
+  <text x="58" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Infra, identity, and TLS are ready</text>
 
   <rect x="268" y="112" width="205" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="290" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Change in Main</text>
-  <text x="290" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Workflow starts automatically</text>
+  <text x="290" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Pipeline Triggered</text>
+  <text x="290" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Code update starts CI/CD</text>
 
   <rect x="500" y="112" width="205" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="522" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Fresh Build + Deploy</text>
-  <text x="522" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Container refreshes in cluster</text>
+  <text x="522" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Image Published</text>
+  <text x="522" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">New container reaches registry</text>
 
   <rect x="732" y="112" width="192" height="92" rx="12" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="754" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Healthy Live Site</text>
-  <text x="754" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Traffic stays on HTTPS</text>
+  <text x="754" y="146" fill="#e8f0ff" font-size="15" font-family="Manrope, Arial" font-weight="700">Deployment Updated</text>
+  <text x="754" y="169" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Rollout verification completes</text>
 
   <line x1="241" y1="158" x2="258" y2="158" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
   <line x1="473" y1="158" x2="490" y2="158" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
@@ -38,5 +38,5 @@
 
   <rect x="36" y="236" width="888" height="66" rx="12" fill="#0a2140" stroke="#22d3ee"/>
   <text x="58" y="265" fill="#e8f0ff" font-size="13" font-family="Manrope, Arial" font-weight="700">Interview summary</text>
-  <text x="58" y="286" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Automation keeps releases consistent, secure, and low-friction from commit to production.</text>
+  <text x="58" y="286" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Consistent releases with clear ownership boundaries and automated verification.</text>
 </svg>
