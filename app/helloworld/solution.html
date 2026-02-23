@@ -324,6 +324,12 @@
       font-size: 0.86rem;
     }
 
+    .flow-inline {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
     .timeline {
       margin-top: 12px;
       position: relative;
@@ -523,7 +529,7 @@
       <article class="card" id="infra">
         <h2>Infrastructure</h2>
         <p class="plain">Cloud setup is automated and repeatable.</p>
-        <p class="tech">Terraform provisions the cluster and identity foundation in one reproducible plan.</p>
+        <p class="tech">Terraform creates the core cloud baseline for this platform.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/infrastructure.svg">
             <img src="/diagrams/infrastructure.svg" alt="Infrastructure diagram showing Terraform creating IAM and GKE resources in Google Cloud." loading="lazy">
@@ -557,12 +563,12 @@
       <article class="card" id="k8s">
         <h2>Kubernetes</h2>
         <p class="plain">Kubernetes keeps service uptime and routes traffic.</p>
-        <p class="tech">Deployment replicas, a ClusterIP service, and ingress provide resilient HTTPS traffic routing.</p>
+        <p class="tech">Deployment and pods run behind a ClusterIP service, with ingress handling HTTPS routing.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/kubernetes.svg">
             <img src="/diagrams/kubernetes.svg" alt="Kubernetes diagram showing ingress, service, and replicated pods." loading="lazy">
           </a>
-          <figcaption>Ingress to service to pods traffic path.</figcaption>
+          <figcaption>Ingress routes traffic to the service, then to pods.</figcaption>
         </figure>
         <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/deployment.yaml" target="_blank" rel="noopener noreferrer">deployment.yaml</a>
@@ -574,7 +580,7 @@
       <article class="card" id="cert">
         <h2>Cert-Manager</h2>
         <p class="plain">HTTPS certificates are issued and renewed automatically.</p>
-        <p class="tech">Let&apos;s Encrypt ACME uses a Cloudflare DNS challenge. The resulting certificate is stored in <code>deniskachar-com-tls</code>.</p>
+        <p class="tech">Let&apos;s Encrypt ACME uses a Cloudflare DNS challenge. The resulting certificate is stored in the <code>deniskachar-com-tls</code> Kubernetes Secret.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/cert-manager.svg">
             <img src="/diagrams/cert-manager.svg" alt="Certificate management diagram showing Cert-Manager, Let's Encrypt, and Cloudflare DNS challenge." loading="lazy">
@@ -623,31 +629,14 @@
 
     <section class="flow" id="flow">
       <h2>Release Flow</h2>
-      <p class="flow-intro">Simple lifecycle view of how a change moves from source to production.</p>
+      <p class="flow-intro">A code update triggers the pipeline, publishes a new image, and updates the running deployment.</p>
       <figure class="diagram">
         <a class="diagram-link" href="/diagrams/release-flow.svg">
           <img src="/diagrams/release-flow.svg" alt="Release flow diagram from code update to verified deployment." loading="lazy">
         </a>
         <figcaption>Release lifecycle from update to verification.</figcaption>
       </figure>
-      <div class="timeline">
-        <article class="phase">
-          <h3 class="phase-title">Platform Prepared</h3>
-          <p class="phase-note">Infrastructure, identity, and TLS foundations are ready.</p>
-        </article>
-        <article class="phase">
-          <h3 class="phase-title">Pipeline Triggered</h3>
-          <p class="phase-note">A code update starts automated build and deployment steps.</p>
-        </article>
-        <article class="phase">
-          <h3 class="phase-title">New Image Published</h3>
-          <p class="phase-note">A fresh container image is built and pushed to the registry.</p>
-        </article>
-        <article class="phase">
-          <h3 class="phase-title">Deployment Updated</h3>
-          <p class="phase-note">Kubernetes applies the update and rollout verification completes.</p>
-        </article>
-      </div>
+      <p class="flow-inline">Health is confirmed by Kubernetes during rollout, while GitHub Actions waits on <code>kubectl rollout status</code> before marking the job successful.</p>
       <div class="links" style="margin-top: 10px;">
         <a href="https://github.com/SNKD92/k8s/blob/main/README.MD" target="_blank" rel="noopener noreferrer">deployment guide</a>
         <a href="https://github.com/SNKD92/k8s/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noopener noreferrer">deploy workflow</a>
