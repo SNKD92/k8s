@@ -523,7 +523,7 @@
       <article class="card" id="infra">
         <h2>Infrastructure</h2>
         <p class="plain">Cloud setup is automated and repeatable.</p>
-        <p class="tech"><code>small-gke</code> cluster is provisioned by Terraform with cost-focused nodes.</p>
+        <p class="tech">Terraform provisions the cluster and identity foundation in one reproducible plan.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/infrastructure.svg">
             <img src="/diagrams/infrastructure.svg" alt="Infrastructure diagram showing Terraform creating IAM and GKE resources in Google Cloud." loading="lazy">
@@ -540,7 +540,7 @@
       <article class="card" id="app">
         <h2>Application</h2>
         <p class="plain">A lightweight static site runs inside an NGINX container.</p>
-        <p class="tech">built from <code>nginx:alpine</code>; build metadata is injected at image build time.</p>
+        <p class="tech">Built from <code>nginx:alpine</code>. Build metadata is injected at image build time.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/application.svg">
             <img src="/diagrams/application.svg" alt="Application diagram showing static pages served by an NGINX container." loading="lazy">
@@ -557,7 +557,7 @@
       <article class="card" id="k8s">
         <h2>Kubernetes</h2>
         <p class="plain">Kubernetes keeps service uptime and routes traffic.</p>
-        <p class="tech">deployment replicas + ClusterIP service + ingress with TLS termination.</p>
+        <p class="tech">Deployment replicas, a ClusterIP service, and ingress provide resilient HTTPS traffic routing.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/kubernetes.svg">
             <img src="/diagrams/kubernetes.svg" alt="Kubernetes diagram showing ingress, service, and replicated pods." loading="lazy">
@@ -574,7 +574,7 @@
       <article class="card" id="cert">
         <h2>Cert-Manager</h2>
         <p class="plain">HTTPS certificates are issued and renewed automatically.</p>
-        <p class="tech">Let&apos;s Encrypt ACME + Cloudflare DNS challenge, stored in <code>deniskachar-com-tls</code>.</p>
+        <p class="tech">Let&apos;s Encrypt ACME uses a Cloudflare DNS challenge. The resulting certificate is stored in <code>deniskachar-com-tls</code>.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/cert-manager.svg">
             <img src="/diagrams/cert-manager.svg" alt="Certificate management diagram showing Cert-Manager, Let's Encrypt, and Cloudflare DNS challenge." loading="lazy">
@@ -590,8 +590,8 @@
 
       <article class="card" id="cicd">
         <h2>CI/CD</h2>
-        <p class="plain">A code push can publish and deploy automatically.</p>
-        <p class="tech">Pipeline publishes a new container image, authenticates to GCP, and updates the running deployment.</p>
+        <p class="plain">Each code update can publish a new container and deploy it automatically.</p>
+        <p class="tech">The workflow builds the image, pushes it, authenticates to GCP, and updates the Kubernetes deployment.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/cicd.svg">
             <img src="/diagrams/cicd.svg" alt="CI/CD diagram showing GitHub Actions building and deploying to Kubernetes." loading="lazy">
@@ -606,8 +606,8 @@
 
       <article class="card" id="security">
         <h2>Identity and Secrets</h2>
-        <p class="plain">Access is temporary, scoped, and keyless by design.</p>
-        <p class="tech">GitHub OIDC exchanges for short-lived Google credentials, while Docker and Cloudflare secrets stay in managed stores.</p>
+        <p class="plain">Access is short-lived, scoped, and keyless by design.</p>
+        <p class="tech">GitHub OIDC exchanges for temporary Google credentials. Docker and Cloudflare values stay in managed secret stores.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/identity.svg">
             <img src="/diagrams/identity.svg" alt="Identity diagram showing GitHub OIDC tokens exchanged for short-lived Google credentials." loading="lazy">
@@ -623,21 +623,21 @@
 
     <section class="flow" id="flow">
       <h2>Release Flow</h2>
-      <p class="flow-intro">Simple lifecycle view of how a change becomes a live release.</p>
+      <p class="flow-intro">Simple lifecycle view of how a change moves from source to production.</p>
       <figure class="diagram">
         <a class="diagram-link" href="/diagrams/release-flow.svg">
-          <img src="/diagrams/release-flow.svg" alt="Release flow diagram from code update to live HTTPS deployment." loading="lazy">
+          <img src="/diagrams/release-flow.svg" alt="Release flow diagram from code update to verified deployment." loading="lazy">
         </a>
         <figcaption>Release lifecycle from update to verification.</figcaption>
       </figure>
       <div class="timeline">
         <article class="phase">
           <h3 class="phase-title">Platform Prepared</h3>
-          <p class="phase-note">Infrastructure, identity, and TLS foundations are already set.</p>
+          <p class="phase-note">Infrastructure, identity, and TLS foundations are ready.</p>
         </article>
         <article class="phase">
           <h3 class="phase-title">Pipeline Triggered</h3>
-          <p class="phase-note">A new code update starts automated build and deployment steps.</p>
+          <p class="phase-note">A code update starts automated build and deployment steps.</p>
         </article>
         <article class="phase">
           <h3 class="phase-title">New Image Published</h3>

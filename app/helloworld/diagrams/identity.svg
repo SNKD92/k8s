@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-label="Identity and secrets diagram">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-label="Identity and secrets flow">
   <defs>
-    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#031226"/>
       <stop offset="1" stop-color="#13233f"/>
     </linearGradient>
-    <linearGradient id="box" x1="0" x2="1" y1="0" y2="0">
+    <linearGradient id="box" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#0b2a4e"/>
       <stop offset="1" stop-color="#123963"/>
     </linearGradient>
@@ -12,29 +12,31 @@
       <polygon points="0 0, 10 3.5, 0 7" fill="#7dd3fc"/>
     </marker>
   </defs>
+
   <rect width="960" height="320" fill="url(#bg)"/>
-  <text x="28" y="38" fill="#7dd3fc" font-family="Manrope, Arial" font-size="22" font-weight="700">Identity + Secrets Picture + Diagram</text>
-  <text x="28" y="62" fill="#b6c5dd" font-family="Manrope, Arial" font-size="14">Short-lived identity tokens replace static cloud keys in CI/CD.</text>
+  <text x="28" y="38" fill="#7dd3fc" font-family="Manrope, Arial, sans-serif" font-size="22" font-weight="700">Identity and Secrets Diagram</text>
+  <text x="28" y="62" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="14">OIDC federation gives short-lived access. Sensitive values stay outside the repository.</text>
 
-  <rect x="44" y="96" width="180" height="160" rx="14" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="66" y="130" fill="#e8f0ff" font-size="16" font-family="Manrope, Arial" font-weight="700">GitHub Actions</text>
-  <text x="66" y="154" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">id-token: write</text>
+  <rect x="20" y="104" width="200" height="140" rx="14" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="42" y="138" fill="#e8f0ff" font-family="Manrope, Arial, sans-serif" font-size="17" font-weight="700">GitHub OIDC</text>
+  <text x="42" y="164" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="13">Workflow requests token</text>
 
-  <rect x="300" y="96" width="210" height="160" rx="14" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="322" y="130" fill="#e8f0ff" font-size="16" font-family="Manrope, Arial" font-weight="700">WIF Provider</text>
-  <text x="322" y="154" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">github-provider</text>
+  <rect x="260" y="104" width="200" height="140" rx="14" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="282" y="138" fill="#e8f0ff" font-family="Manrope, Arial, sans-serif" font-size="17" font-weight="700">WIF Provider</text>
+  <text x="282" y="164" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="13">Validates repo claims</text>
 
-  <rect x="586" y="96" width="170" height="160" rx="14" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="608" y="130" fill="#e8f0ff" font-size="16" font-family="Manrope, Arial" font-weight="700">Service</text>
-  <text x="608" y="152" fill="#e8f0ff" font-size="16" font-family="Manrope, Arial" font-weight="700">Account</text>
+  <rect x="500" y="104" width="200" height="140" rx="14" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="522" y="138" fill="#e8f0ff" font-family="Manrope, Arial, sans-serif" font-size="17" font-weight="700">Service Account</text>
+  <text x="522" y="164" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="13">Temporary cloud access</text>
 
-  <rect x="792" y="96" width="130" height="160" rx="14" fill="url(#box)" stroke="#22d3ee"/>
-  <text x="814" y="130" fill="#e8f0ff" font-size="16" font-family="Manrope, Arial" font-weight="700">GKE API</text>
+  <rect x="740" y="104" width="200" height="140" rx="14" fill="url(#box)" stroke="#22d3ee"/>
+  <text x="762" y="138" fill="#e8f0ff" font-family="Manrope, Arial, sans-serif" font-size="17" font-weight="700">Deployment APIs</text>
+  <text x="762" y="164" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="13">Cluster operations allowed</text>
 
-  <line x1="224" y1="176" x2="290" y2="176" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="510" y1="176" x2="576" y2="176" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
-  <line x1="756" y1="176" x2="782" y2="176" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="220" y1="174" x2="250" y2="174" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="460" y1="174" x2="490" y2="174" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="700" y1="174" x2="730" y2="174" stroke="#7dd3fc" stroke-width="3" marker-end="url(#arrow)"/>
 
-  <rect x="300" y="274" width="456" height="26" rx="7" fill="#0a2140" stroke="#7dd3fc"/>
-  <text x="314" y="292" fill="#b6c5dd" font-size="12" font-family="Manrope, Arial">Secrets live outside Git source: Docker credentials and Cloudflare token</text>
+  <rect x="20" y="266" width="920" height="34" rx="10" fill="#0a2140" stroke="#7dd3fc"/>
+  <text x="40" y="288" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="13">Docker and Cloudflare secrets are read from managed secret stores, not hardcoded in source.</text>
 </svg>
