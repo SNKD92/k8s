@@ -516,7 +516,7 @@
       <article class="card" id="infra">
         <h2>Infrastructure</h2>
         <p class="plain">Cloud setup is automated and repeatable.</p>
-        <p class="tech">Tech: <code>small-gke</code> in <code>us-central1-a</code>, created by Terraform with cost-focused nodes.</p>
+        <p class="tech"><code>small-gke</code> in <code>us-central1-a</code>, created by Terraform with cost-focused nodes.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/infrastructure.svg">
             <img src="/diagrams/infrastructure.svg" alt="Infrastructure diagram showing Terraform creating IAM and GKE resources in Google Cloud." loading="lazy">
@@ -533,7 +533,7 @@
       <article class="card" id="app">
         <h2>Application</h2>
         <p class="plain">A lightweight static site runs inside an NGINX container.</p>
-        <p class="tech">Tech: built from <code>nginx:alpine</code>; build metadata is injected at image build time.</p>
+        <p class="tech">built from <code>nginx:alpine</code>; build metadata is injected at image build time.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/application.svg">
             <img src="/diagrams/application.svg" alt="Application diagram showing static pages served by an NGINX container." loading="lazy">
@@ -550,7 +550,7 @@
       <article class="card" id="k8s">
         <h2>Kubernetes</h2>
         <p class="plain">Kubernetes keeps service uptime and routes traffic.</p>
-        <p class="tech">Tech: deployment replicas + ClusterIP service + ingress with TLS termination.</p>
+        <p class="tech">deployment replicas + ClusterIP service + ingress with TLS termination.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/kubernetes.svg">
             <img src="/diagrams/kubernetes.svg" alt="Kubernetes diagram showing ingress, service, and replicated pods." loading="lazy">
@@ -567,7 +567,7 @@
       <article class="card" id="cert">
         <h2>Cert-Manager</h2>
         <p class="plain">HTTPS certificates are issued and renewed automatically.</p>
-        <p class="tech">Tech: Let&apos;s Encrypt ACME + Cloudflare DNS challenge, stored in <code>deniskachar-com-tls</code>.</p>
+        <p class="tech">Let&apos;s Encrypt ACME + Cloudflare DNS challenge, stored in <code>deniskachar-com-tls</code>.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/cert-manager.svg">
             <img src="/diagrams/cert-manager.svg" alt="Certificate management diagram showing Cert-Manager, Let's Encrypt, and Cloudflare DNS challenge." loading="lazy">
@@ -584,7 +584,7 @@
       <article class="card" id="cicd">
         <h2>CI/CD</h2>
         <p class="plain">A code push can publish and deploy automatically.</p>
-        <p class="tech">Tech: build and push image tags, authenticate to GCP, then run <code>kubectl set image</code>.</p>
+        <p class="tech">build and push image tags, authenticate to GCP, then run <code>kubectl set image</code>.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/cicd.svg">
             <img src="/diagrams/cicd.svg" alt="CI/CD diagram showing GitHub Actions building and deploying to Kubernetes." loading="lazy">
@@ -600,7 +600,7 @@
       <article class="card" id="security">
         <h2>Identity and Secrets</h2>
         <p class="plain">Access is short-lived and keyless by design.</p>
-        <p class="tech">Tech: GitHub OIDC federation + Workload Identity; credentials remain in secret managers.</p>
+        <p class="tech">GitHub OIDC federation + Workload Identity; credentials remain in secret managers.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/identity.svg">
             <img src="/diagrams/identity.svg" alt="Identity diagram showing GitHub OIDC tokens exchanged for short-lived Google credentials." loading="lazy">
