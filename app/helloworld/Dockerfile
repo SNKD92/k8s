@@ -9,6 +9,7 @@ ARG BUILD_TIME_ISO=auto
 
 # Copy static pages
 COPY index.html solution.html /usr/share/nginx/html/
+COPY MCP/ /usr/share/nginx/html/MCP/
 COPY diagrams/ /usr/share/nginx/html/diagrams/
 
 # Inject image build time into static pages
