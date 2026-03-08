@@ -28,7 +28,7 @@
       color: var(--text);
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       padding: 20px;
     }
@@ -193,6 +193,81 @@
       padding: 8px 12px;
       min-height: 36px;
     }
+
+    .info {
+      border-top: 1px solid var(--line);
+      background: #f8fbff;
+      padding: 14px 14px 16px;
+    }
+
+    .info h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #0f2b63;
+    }
+
+    .info p {
+      margin: 8px 0 0;
+      color: #425177;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .scheme {
+      margin: 12px 0 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .scheme img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .scheme figcaption {
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: #fbfdff;
+    }
+
+    .explain-grid {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .explain-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px 11px;
+    }
+
+    .explain-card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #123378;
+    }
+
+    .explain-card ol {
+      margin: 8px 0 0 18px;
+      padding: 0;
+      color: #364566;
+      line-height: 1.45;
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      .explain-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -240,6 +315,40 @@ Professional context (editable by Denis):
     </form>
 
     <div id="status" class="status">Ready</div>
+
+    <section class="info" id="mcp-architecture">
+      <h2>How This MCP Chat Is Deployed and Works</h2>
+      <p>
+        This page and its chat backend are deployed through the same platform pipeline: container build, Kubernetes rollout, and
+        secure in-cluster routing to Ollama.
+      </p>
+      <figure class="scheme">
+        <img src="/diagrams/mcp-chat-flow.svg" alt="Architecture diagram for MCP chat deployment and runtime request flow." loading="lazy">
+        <figcaption>MCP deployment flow (top) and live chat request flow (bottom).</figcaption>
+      </figure>
+      <div class="explain-grid">
+        <article class="explain-card">
+          <h3>Deployment Path</h3>
+          <ol>
+            <li>Code changes are pushed to <code>main</code>.</li>
+            <li>GitHub Actions builds and pushes a new app image.</li>
+            <li>Kubernetes deployment is updated and rolled out.</li>
+            <li>LLM manifests run Ollama on the dedicated <code>llm-pool</code>.</li>
+            <li>Ingress serves the updated MCP page on <code>/MCP</code>.</li>
+          </ol>
+        </article>
+        <article class="explain-card">
+          <h3>Runtime Request Path</h3>
+          <ol>
+            <li>Your browser loads the static MCP UI from NGINX.</li>
+            <li>Chat calls <code>/ollama/api/chat</code> on the same domain.</li>
+            <li>NGINX proxies that path to <code>ollama.llm.svc</code> inside the cluster.</li>
+            <li>Ollama runs the model and returns the response through the same path.</li>
+            <li>The UI renders the model response in the chat stream.</li>
+          </ol>
+        </article>
+      </div>
+    </section>
   </main>
 
   <script>
