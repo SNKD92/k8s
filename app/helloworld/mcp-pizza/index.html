@@ -560,6 +560,10 @@
               : machine-readable tool schemas for menu, ordering, and billing.
             </li>
             <li>
+              <a href="/mcp-pizza/api/tools/call" target="_blank" rel="noopener noreferrer">Direct Tools Endpoint</a>
+              : HTTP tool-call endpoint for personal agents (POST JSON).
+            </li>
+            <li>
               <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">Model Context Protocol Docs</a>
               : protocol reference for personal agent integrations.
             </li>
@@ -567,7 +571,16 @@
               <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/mcp-pizza/index.html" target="_blank" rel="noopener noreferrer">Source Page</a>
               : implementation of this demo UI.
             </li>
+            <li>
+              <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/pizza-api/api_server.py" target="_blank" rel="noopener noreferrer">API Server Source</a>
+              : implementation of direct HTTP tool execution and tracking IDs.
+            </li>
           </ul>
+          <pre>POST /mcp-pizza/api/tools/call
+{"tool":"create_order","arguments":{"customerName":"Alex","orderType":"pickup"}}
+{"tool":"add_item","arguments":{"orderId":"PZ-1001","itemId":"margherita","size":"large","quantity":1}}
+{"tool":"place_order","arguments":{"orderId":"PZ-1001"}}
+{"tool":"track_order","arguments":{"orderId":"PZ-1001"}}</pre>
           <pre id="contractPreview">Loading API contract...</pre>
         </details>
       </aside>

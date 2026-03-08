@@ -162,3 +162,30 @@ https://deniskachar.com
 ## Note
 
 The Cloudflare API token is stored in GCP Secret Manager and injected into Kubernetes via the Step 4 command.
+
+## Pizza MCP Direct API
+
+The pizza demo exposes a direct tool endpoint for agent integrations:
+
+- Contract: `/mcp-pizza/mcp-tools.json`
+- Tool calls: `POST /mcp-pizza/api/tools/call`
+
+Example flow:
+
+```bash
+curl -s https://deniskachar.com/mcp-pizza/api/tools/call \
+  -H 'Content-Type: application/json' \
+  -d '{"tool":"create_order","arguments":{"customerName":"Alex","orderType":"pickup"}}'
+
+curl -s https://deniskachar.com/mcp-pizza/api/tools/call \
+  -H 'Content-Type: application/json' \
+  -d '{"tool":"add_item","arguments":{"orderId":"PZ-1001","itemId":"margherita","size":"large","quantity":1}}'
+
+curl -s https://deniskachar.com/mcp-pizza/api/tools/call \
+  -H 'Content-Type: application/json' \
+  -d '{"tool":"place_order","arguments":{"orderId":"PZ-1001"}}'
+
+curl -s https://deniskachar.com/mcp-pizza/api/tools/call \
+  -H 'Content-Type: application/json' \
+  -d '{"tool":"track_order","arguments":{"orderId":"PZ-1001"}}'
+```

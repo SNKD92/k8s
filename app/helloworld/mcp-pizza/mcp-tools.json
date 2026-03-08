@@ -1,17 +1,19 @@
 {
   "server": {
     "name": "pizza-place-mcp",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "MCP-ready pizza ordering tools exposed by the /mcp-pizza demo chat.",
     "basePath": "/mcp-pizza"
   },
   "transport": {
-    "mode": "browser-demo",
+    "mode": "browser-demo+http",
+    "httpEndpoint": "/mcp-pizza/api/tools/call",
+    "jsonRpcMethod": "tools/call",
     "notes": [
-      "This is a static MCP-ready demo: tools are executed in-browser for quick testing.",
-      "Agents can inspect this contract and submit tool calls through the chat input in JSON format.",
+      "Tools are available in browser UI and via direct HTTP endpoint for agent integrations.",
+      "Direct endpoint accepts both {\"tool\":...,\"arguments\":...} and JSON-RPC tools/call payloads.",
       "The web UI also supports low-tech natural-language ordering and one-click actions.",
-      "Order tracking history is stored in browser localStorage for demo persistence."
+      "HTTP endpoint stores server-side order state for tracking IDs and follow-up calls."
     ]
   },
   "references": [
@@ -26,6 +28,11 @@
       "url": "/mcp-pizza"
     },
     {
+      "name": "pizza_http_tools_call",
+      "description": "Direct tool-call endpoint for personal agents.",
+      "url": "/mcp-pizza/api/tools/call"
+    },
+    {
       "name": "mcp_official_docs",
       "description": "Official Model Context Protocol documentation.",
       "url": "https://modelcontextprotocol.io"
@@ -34,6 +41,11 @@
       "name": "pizza_ui_source",
       "description": "Source implementation for the pizza MCP page.",
       "url": "https://github.com/SNKD92/k8s/blob/main/app/helloworld/mcp-pizza/index.html"
+    },
+    {
+      "name": "pizza_api_source",
+      "description": "Source implementation for the direct HTTP tools endpoint.",
+      "url": "https://github.com/SNKD92/k8s/blob/main/app/helloworld/pizza-api/api_server.py"
     }
   ],
   "tools": [
@@ -93,6 +105,7 @@
         "type": "object",
         "required": ["itemId"],
         "properties": {
+          "orderId": { "type": "string" },
           "itemId": { "type": "string" },
           "size": {
             "type": "string",
@@ -117,6 +130,7 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "orderId": { "type": "string" },
           "lineId": {
             "type": "integer",
             "minimum": 1
@@ -147,6 +161,7 @@
         "type": "object",
         "required": ["extras"],
         "properties": {
+          "orderId": { "type": "string" },
           "lineId": {
             "type": "integer",
             "minimum": 1
@@ -168,6 +183,7 @@
         "type": "object",
         "required": ["extras"],
         "properties": {
+          "orderId": { "type": "string" },
           "lineId": {
             "type": "integer",
             "minimum": 1
@@ -189,6 +205,7 @@
         "type": "object",
         "required": ["lineId"],
         "properties": {
+          "orderId": { "type": "string" },
           "lineId": {
             "type": "integer",
             "minimum": 1
@@ -202,7 +219,9 @@
       "description": "Return the current order details and subtotal.",
       "inputSchema": {
         "type": "object",
-        "properties": {},
+        "properties": {
+          "orderId": { "type": "string" }
+        },
         "additionalProperties": false
       }
     },
@@ -238,6 +257,7 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "orderId": { "type": "string" },
           "notes": { "type": "string" }
         },
         "additionalProperties": false
@@ -249,6 +269,7 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "orderId": { "type": "string" },
           "tipPercent": {
             "type": "number",
             "minimum": 0,
@@ -260,10 +281,13 @@
     }
   ],
   "sampleToolCall": {
-    "tool": "add_extras",
+    "tool": "add_item",
     "arguments": {
-      "lineId": 1,
-      "extras": ["olives", "basil"]
+      "orderId": "PZ-1001",
+      "itemId": "margherita",
+      "size": "large",
+      "quantity": 1,
+      "extras": ["extra-cheese"]
     }
   },
   "sampleJsonRpcCall": {
@@ -273,8 +297,39 @@
     "params": {
       "name": "get_bill",
       "arguments": {
+        "orderId": "PZ-1001",
         "tipPercent": 12
       }
     }
-  }
+  },
+  "sampleSequence": [
+    {
+      "tool": "create_order",
+      "arguments": {
+        "customerName": "Alex",
+        "orderType": "pickup"
+      }
+    },
+    {
+      "tool": "add_item",
+      "arguments": {
+        "orderId": "PZ-1001",
+        "itemId": "margherita",
+        "size": "large",
+        "quantity": 1
+      }
+    },
+    {
+      "tool": "place_order",
+      "arguments": {
+        "orderId": "PZ-1001"
+      }
+    },
+    {
+      "tool": "track_order",
+      "arguments": {
+        "orderId": "PZ-1001"
+      }
+    }
+  ]
 }
