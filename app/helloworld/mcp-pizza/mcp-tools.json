@@ -9,7 +9,8 @@
     "mode": "browser-demo",
     "notes": [
       "This is a static MCP-ready demo: tools are executed in-browser for quick testing.",
-      "Agents can inspect this contract and submit tool calls through the chat input in JSON format."
+      "Agents can inspect this contract and submit tool calls through the chat input in JSON format.",
+      "The web UI also supports low-tech natural-language ordering and one-click actions."
     ]
   },
   "references": [

@@ -583,8 +583,8 @@
 
       <article class="card" id="mcp">
         <h2>MCP Chats and LLM</h2>
-        <p class="plain">The platform now serves two MCP-oriented chat pages: a general assistant at <code>/mcp</code> and a pizza-ordering MCP demo at <code>/mcp-pizza</code>.</p>
-        <p class="tech">The general page at <code>/mcp</code> calls <code>/ollama/api/chat</code> through NGINX to the <code>ollama</code> service in namespace <code>llm</code>. The pizza page at <code>/mcp-pizza</code> includes an MCP-ready tool contract JSON and deterministic menu/order/bill tool handling in the browser, so agent calls can be tested with structured payloads.</p>
+        <p class="plain">The platform now serves two MCP-oriented chat pages: a general assistant at <code>/mcp</code> and a pizza-ordering MCP demo at <code>/mcp-pizza</code>. The pizza page is optimized for non-technical visitors with simple step bars, quick buttons, and natural-language ordering.</p>
+        <p class="tech">The general page at <code>/mcp</code> calls <code>/ollama/api/chat</code> through NGINX to the <code>ollama</code> service in namespace <code>llm</code>. The pizza page at <code>/mcp-pizza</code> keeps MCP-ready API schemas in <code>mcp-tools.json</code>, while advanced technical details stay collapsed by default for demo-friendly presentation.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/mcp-chat-flow.svg">
             <img src="/diagrams/mcp-chat-flow.svg" alt="MCP chat scheme showing deployment pipeline and runtime request flow to Ollama." loading="lazy">

@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pizza MCP Chat</title>
+  <title>Pizza Order Demo</title>
   <style>
     :root {
-      color-scheme: light;
-      --bg: #fff4eb;
-      --bg-soft: #ffe7d3;
+      --bg: #fff6ee;
+      --bg-2: #ffe9d6;
       --panel: #ffffff;
-      --line: #eec9a7;
-      --text: #32180a;
-      --muted: #7a5842;
-      --brand: #c74700;
-      --brand-2: #f97316;
-      --user: #ffe0ca;
-      --assistant: #f4faef;
-      --ok: #1f7a33;
-      --warn: #b42318;
+      --line: #e8c8a9;
+      --text: #2f1809;
+      --muted: #765543;
+      --brand: #d35400;
+      --brand-2: #f17a1f;
+      --user: #ffe5d2;
+      --assistant: #f3faf1;
+      --ok: #197137;
+      --error: #b42318;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -29,14 +30,14 @@
       color: var(--text);
       min-height: 100vh;
       background:
-        radial-gradient(circle at 12% 0%, #ffd6b2, transparent 34%),
-        radial-gradient(circle at 88% 100%, #ffe8ce, transparent 36%),
-        linear-gradient(160deg, var(--bg), var(--bg-soft));
-      padding: 16px;
+        radial-gradient(circle at 0% 0%, #ffd9bc, transparent 36%),
+        radial-gradient(circle at 100% 100%, #ffeacc, transparent 38%),
+        linear-gradient(160deg, var(--bg), var(--bg-2));
+      padding: 14px;
     }
 
     .app {
-      width: min(1220px, 100%);
+      width: min(1240px, 100%);
       margin: 0 auto;
       display: grid;
       gap: 12px;
@@ -47,51 +48,84 @@
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 14px;
-      box-shadow: 0 10px 24px rgba(75, 28, 3, 0.08);
+      box-shadow: 0 10px 24px rgba(90, 34, 6, 0.08);
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
-      gap: 10px;
       align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .title {
+    .title-wrap h1 {
       margin: 0;
-      font-size: clamp(1.2rem, 3.6vw, 1.7rem);
+      font-size: clamp(1.2rem, 3.8vw, 1.8rem);
     }
 
-    .tag {
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .badge {
       display: inline-block;
+      margin-left: 8px;
       padding: 3px 8px;
-      border-radius: 999px;
-      background: #fff2e4;
-      border: 1px solid #f3c79f;
-      color: #8a3f08;
       font-size: 12px;
       font-weight: 700;
-      margin-left: 8px;
+      border-radius: 999px;
+      background: #fff2e7;
+      border: 1px solid #f0c79f;
+      color: #8c3e04;
     }
 
-    .actions {
+    .links {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
     }
 
-    .actions a {
+    .links a {
       text-decoration: none;
-      color: #6c2b00;
+      font-size: 13px;
+      font-weight: 700;
+      color: #6c2f04;
       border: 1px solid var(--line);
       background: #fff;
       padding: 7px 10px;
       border-radius: 8px;
+    }
+
+    .bars {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .bar {
+      background: #fffdfb;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 8px 20px rgba(90, 34, 6, 0.04);
+    }
+
+    .bar b {
+      color: #803904;
       font-size: 13px;
-      font-weight: 700;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .bar span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
     }
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
       gap: 12px;
       align-items: start;
     }
@@ -100,92 +134,93 @@
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 14px;
-      box-shadow: 0 10px 24px rgba(75, 28, 3, 0.08);
+      box-shadow: 0 10px 24px rgba(90, 34, 6, 0.08);
       overflow: hidden;
     }
 
     .chat {
-      padding: 14px;
       min-height: 420px;
-      max-height: 64vh;
+      max-height: 66vh;
       overflow: auto;
+      padding: 14px;
       background: linear-gradient(180deg, #fff, #fffbf7);
     }
 
     .msg {
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 9px 11px;
+      padding: 10px 12px;
       margin-bottom: 9px;
       max-width: 92%;
       white-space: pre-wrap;
       word-break: break-word;
-      line-height: 1.42;
+      line-height: 1.45;
       font-size: 14px;
     }
 
     .msg.user {
-      background: var(--user);
       margin-left: auto;
+      background: var(--user);
     }
 
     .msg.assistant {
-      background: var(--assistant);
       margin-right: auto;
+      background: var(--assistant);
     }
 
     .msg.error {
-      color: var(--warn);
-      background: #fff2f2;
-      border-color: #f4cccc;
+      color: var(--error);
+      background: #fff3f3;
+      border-color: #f1c6c6;
     }
 
     .composer {
       border-top: 1px solid var(--line);
-      padding: 11px;
       display: grid;
-      gap: 9px;
       grid-template-columns: 1fr auto;
-      align-items: end;
+      gap: 9px;
+      padding: 10px;
       background: #fffdfb;
+      align-items: end;
     }
 
     .composer textarea {
       width: 100%;
-      min-height: 86px;
+      min-height: 78px;
       resize: vertical;
       border: 1px solid var(--line);
       border-radius: 10px;
-      padding: 10px;
       font: inherit;
-      font-size: 14px;
-      background: #fff;
-      color: var(--text);
+      font-size: 15px;
+      padding: 10px;
     }
 
-    .composer button {
-      min-height: 46px;
-      padding: 0 18px;
+    button {
       border: 0;
       border-radius: 10px;
       font: inherit;
       font-weight: 800;
       cursor: pointer;
+    }
+
+    .send {
+      min-height: 46px;
+      padding: 0 18px;
       background: linear-gradient(125deg, var(--brand), var(--brand-2));
       color: #fff;
     }
 
-    .composer button:disabled {
-      opacity: 0.62;
+    .send:disabled {
+      opacity: 0.6;
       cursor: not-allowed;
     }
 
     .status {
       border-top: 1px solid var(--line);
+      min-height: 34px;
+      padding: 8px 10px;
       font-size: 13px;
       color: var(--muted);
-      min-height: 34px;
-      padding: 8px 11px;
       background: #fffcf9;
     }
 
@@ -194,100 +229,188 @@
       gap: 0;
     }
 
-    .side-section {
+    .card {
       border-top: 1px solid var(--line);
       padding: 12px;
     }
 
-    .side-section:first-child {
+    .card:first-child {
       border-top: 0;
     }
 
-    .side h2 {
+    .card h2,
+    .card h3 {
       margin: 0;
-      font-size: 18px;
-      color: #6a2f05;
+      color: #6f3305;
     }
 
-    .side h3 {
-      margin: 0;
-      font-size: 14px;
-      color: #7b3b0a;
+    .card h2 {
+      font-size: 18px;
+    }
+
+    .card h3 {
+      font-size: 15px;
     }
 
     .hint {
-      margin: 8px 0 0;
+      margin: 7px 0 0;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.45;
+      line-height: 1.4;
     }
 
-    .quick {
-      margin: 10px 0 0;
-      padding: 0;
-      list-style: none;
+    .fields {
+      margin-top: 9px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 9px;
+      font: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .small-btn,
+    .quick-btn {
+      min-height: 40px;
+      padding: 0 12px;
+      background: #f7e4d5;
+      color: #73350b;
+      border: 1px solid #e9c7ab;
+      font-weight: 700;
+    }
+
+    .small-btn.primary {
+      background: linear-gradient(125deg, var(--brand), var(--brand-2));
+      border: 0;
+      color: #fff;
+    }
+
+    .quick-grid {
+      margin-top: 9px;
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .extras {
       display: grid;
       gap: 6px;
+      margin-top: 3px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .extra-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #eed6c1;
+      border-radius: 8px;
+      padding: 7px;
       font-size: 13px;
-      color: #5f391f;
+      color: #684432;
+      background: #fffaf6;
+    }
+
+    .extra-item input {
+      width: auto;
+      margin: 0;
+    }
+
+    .summary {
+      margin-top: 8px;
+      border: 1px solid #efd9c6;
+      border-radius: 10px;
+      background: #fffaf5;
+      padding: 9px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #4f2e1a;
+      min-height: 98px;
+    }
+
+    .summary b {
+      color: #7a3608;
+    }
+
+    details.advanced {
+      background: #fffcfa;
+    }
+
+    details.advanced summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: #6d3208;
     }
 
     .refs {
-      margin: 10px 0 0;
+      margin: 8px 0 0;
       padding-left: 18px;
       display: grid;
       gap: 7px;
       color: #5f391f;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
     .refs a {
+      color: #945009;
       font-weight: 700;
       text-decoration: none;
-      border-bottom: 1px dashed #c28856;
-    }
-
-    .quick code,
-    .mono {
-      font-family: "Consolas", "Courier New", monospace;
-      font-size: 12px;
-      background: #fff5ed;
-      border: 1px solid #f3d4bb;
-      padding: 1px 4px;
-      border-radius: 5px;
-      color: #72320a;
+      border-bottom: 1px dashed #c78953;
     }
 
     pre {
       margin: 8px 0 0;
-      border: 1px solid #f2dac6;
+      border: 1px solid #efdac7;
       border-radius: 10px;
       background: #fffaf5;
       padding: 9px;
-      max-height: 240px;
-      overflow: auto;
-      color: #4a2a16;
       font-size: 12px;
+      max-height: 220px;
+      overflow: auto;
+      color: #4b2b18;
       line-height: 1.35;
     }
 
-    .good {
-      color: var(--ok);
-      font-weight: 700;
-    }
-
-    a {
-      color: #995000;
-    }
-
-    @media (max-width: 980px) {
+    @media (max-width: 1080px) {
       .layout {
         grid-template-columns: 1fr;
       }
 
       .chat {
-        max-height: 50vh;
+        max-height: 54vh;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .bars {
+        grid-template-columns: 1fr;
+      }
+
+      .row,
+      .quick-grid,
+      .extras {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -295,73 +418,137 @@
 <body>
   <main class="app">
     <header class="top">
-      <h1 class="title">Pizza Place MCP Chat <span class="tag">mcp-ready demo</span></h1>
-      <nav class="actions" aria-label="Quick links">
+      <div class="title-wrap">
+        <h1>Pizza Order Demo <span class="badge">MCP-ready</span></h1>
+        <p class="subtitle">Talk naturally, click buttons, or connect your personal agent through the API contract.</p>
+      </div>
+      <nav class="links" aria-label="Page links">
         <a href="/">Home</a>
-        <a href="/mcp">General MCP Chat</a>
-        <a href="/mcp-pizza/mcp-tools.json" target="_blank" rel="noopener noreferrer">API Description JSON</a>
+        <a href="/mcp">General Chat</a>
+        <a href="/mcp-pizza/mcp-tools.json" target="_blank" rel="noopener noreferrer">API Contract JSON</a>
       </nav>
     </header>
 
+    <section class="bars" aria-label="Simple guidance bars">
+      <article class="bar">
+        <b>Step 1: Ask in plain English</b>
+        <span>Example: "I want cheese pizza" or "show menu".</span>
+      </article>
+      <article class="bar">
+        <b>Step 2: Use quick buttons</b>
+        <span>Use one-click actions if you prefer not to type.</span>
+      </article>
+      <article class="bar">
+        <b>Step 3: Review bill</b>
+        <span>Get an itemized bill with tax and optional tip.</span>
+      </article>
+    </section>
+
     <section class="layout">
-      <section class="panel" aria-label="Pizza MCP chat panel">
+      <section class="panel" aria-label="Chat panel">
         <div id="chat" class="chat" aria-live="polite"></div>
         <form id="form" class="composer">
-          <textarea id="prompt" placeholder="Type JSON tool calls, JSON-RPC tools/call, or slash commands like /menu, /add, /bill" required></textarea>
-          <button id="send" type="submit">Run</button>
+          <textarea id="prompt" placeholder="Ask naturally: I want cheese pizza, show menu, get my bill" required></textarea>
+          <button id="send" class="send" type="submit">Send</button>
         </form>
         <div id="status" class="status">Ready</div>
       </section>
 
-      <aside class="panel side" aria-label="MCP contract and order state">
-        <section class="side-section">
-          <h2>MCP Contract</h2>
-          <p class="hint">
-            Personal agents can use the static contract at
-            <a href="/mcp-pizza/mcp-tools.json" target="_blank" rel="noopener noreferrer"><code>/mcp-pizza/mcp-tools.json</code></a>.
-          </p>
-          <pre id="contractPreview">Loading tool contract...</pre>
+      <aside class="panel side" aria-label="Order controls">
+        <section class="card">
+          <h2>Easy Order Setup</h2>
+          <p class="hint">Start an order once, then keep adding items.</p>
+          <div class="fields">
+            <div>
+              <label for="customerName">Customer Name</label>
+              <input id="customerName" type="text" value="Guest" autocomplete="name">
+            </div>
+            <div class="row">
+              <div>
+                <label for="orderType">Order Type</label>
+                <select id="orderType">
+                  <option value="pickup">Pickup</option>
+                  <option value="delivery">Delivery</option>
+                </select>
+              </div>
+              <div>
+                <label for="phone">Phone (optional)</label>
+                <input id="phone" type="text" placeholder="555-0100" autocomplete="tel">
+              </div>
+            </div>
+            <div>
+              <label for="address">Address (for delivery)</label>
+              <input id="address" type="text" placeholder="Street and city">
+            </div>
+            <button id="startOrderBtn" class="small-btn primary" type="button">Start or Update Order</button>
+          </div>
         </section>
 
-        <section class="side-section">
-          <h3>Quick Commands</h3>
-          <ul class="quick">
-            <li><code>/menu</code> or <code>/menu pizza</code></li>
-            <li><code>/new Denis</code> (creates order)</li>
-            <li><code>/add margherita large 2 extra-cheese,basil</code></li>
-            <li><code>/remove 1</code> (lineId)</li>
-            <li><code>/order</code>, <code>/place</code>, <code>/bill 12</code></li>
-            <li><code>/tools</code> prints API description summary</li>
-          </ul>
+        <section class="card">
+          <h3>Add Item</h3>
+          <div class="fields">
+            <div>
+              <label for="itemSelect">Menu Item</label>
+              <select id="itemSelect"></select>
+            </div>
+            <div class="row">
+              <div>
+                <label for="sizeSelect">Size</label>
+                <select id="sizeSelect">
+                  <option value="small">Small</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+              <div>
+                <label for="qtyInput">Quantity</label>
+                <input id="qtyInput" type="number" min="1" max="20" value="1">
+              </div>
+            </div>
+            <div>
+              <label>Extras</label>
+              <div id="extrasWrap" class="extras"></div>
+            </div>
+            <button id="addItemBtn" class="small-btn primary" type="button">Add to Order</button>
+          </div>
         </section>
 
-        <section class="side-section">
-          <h3>References</h3>
+        <section class="card">
+          <h3>Quick Actions</h3>
+          <div class="quick-grid">
+            <button class="quick-btn" type="button" data-action="menu">Show Menu</button>
+            <button class="quick-btn" type="button" data-action="new-order">New Order</button>
+            <button class="quick-btn" type="button" data-action="cheese">Add Cheese Pizza</button>
+            <button class="quick-btn" type="button" data-action="pepperoni">Add Pepperoni</button>
+            <button class="quick-btn" type="button" data-action="order">View Order</button>
+            <button class="quick-btn" type="button" data-action="bill">Get Bill</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>Current Order</h3>
+          <div id="orderSummary" class="summary">No active order yet.</div>
+        </section>
+
+        <details class="card advanced">
+          <summary>Advanced: MCP/API</summary>
+          <p class="hint">Hidden by default for non-technical viewers. Use these links for integrations.</p>
           <ul class="refs">
             <li>
               <a href="/mcp-pizza/mcp-tools.json" target="_blank" rel="noopener noreferrer">Pizza MCP API Contract</a>
-              : machine-readable tool schemas for menu, order, and billing operations.
+              : machine-readable tool schemas for menu, ordering, and billing.
             </li>
             <li>
-              <a href="/mcp-pizza" target="_blank" rel="noopener noreferrer">Pizza Chat Interface</a>
-              : interactive MCP-ready testing UI for tool calls and JSON-RPC messages.
-            </li>
-            <li>
-              <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">Model Context Protocol</a>
-              : official MCP documentation and concepts.
+              <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">Model Context Protocol Docs</a>
+              : protocol reference for personal agent integrations.
             </li>
             <li>
               <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/mcp-pizza/index.html" target="_blank" rel="noopener noreferrer">Source Page</a>
-              : implementation details of this pizza MCP demo UI and tool handler logic.
+              : implementation of this demo UI.
             </li>
           </ul>
-        </section>
-
-        <section class="side-section">
-          <h3>Active Order Snapshot</h3>
-          <pre id="orderPreview">No order yet. Create one with /new or create_order.</pre>
-          <p class="hint"><span class="good">Tax:</span> 8.25% | Delivery fee: $4.50</p>
-        </section>
+          <pre id="contractPreview">Loading API contract...</pre>
+        </details>
       </aside>
     </section>
   </main>
@@ -437,40 +624,68 @@
       { id: "gluten-free-crust", name: "Gluten-Free Crust", price: 2.5, appliesTo: ["pizza"] }
     ];
 
+    const ITEM_KEYWORDS = {
+      margherita: ["margherita", "cheese pizza", "cheese", "classic pizza"],
+      pepperoni: ["pepperoni"],
+      "truffle-mushroom": ["truffle", "mushroom"],
+      hawaiian: ["hawaiian", "pineapple"],
+      "caesar-salad": ["caesar", "salad"],
+      "garlic-knots": ["garlic knot", "garlic knots"],
+      cola: ["cola", "coke", "soda"],
+      "sparkling-water": ["sparkling water", "water"]
+    };
+
     const chatEl = document.getElementById("chat");
     const formEl = document.getElementById("form");
     const promptEl = document.getElementById("prompt");
     const sendEl = document.getElementById("send");
     const statusEl = document.getElementById("status");
+
+    const customerNameEl = document.getElementById("customerName");
+    const orderTypeEl = document.getElementById("orderType");
+    const phoneEl = document.getElementById("phone");
+    const addressEl = document.getElementById("address");
+    const startOrderBtn = document.getElementById("startOrderBtn");
+
+    const itemSelectEl = document.getElementById("itemSelect");
+    const sizeSelectEl = document.getElementById("sizeSelect");
+    const qtyInputEl = document.getElementById("qtyInput");
+    const extrasWrapEl = document.getElementById("extrasWrap");
+    const addItemBtn = document.getElementById("addItemBtn");
+
+    const orderSummaryEl = document.getElementById("orderSummary");
     const contractPreviewEl = document.getElementById("contractPreview");
-    const orderPreviewEl = document.getElementById("orderPreview");
 
     let currentOrder = null;
     let orderSeq = 1000;
     let lineSeq = 1;
 
+    function toMoney(value) {
+      return Number(value.toFixed(2));
+    }
+
+    function moneyText(value) {
+      return "$" + toMoney(value).toFixed(2);
+    }
+
     function clone(value) {
       return JSON.parse(JSON.stringify(value));
     }
 
-    function toMoney(value) {
-      return Number(value.toFixed(2));
+    function nowIso() {
+      return new Date().toISOString();
     }
 
     function setStatus(text) {
       statusEl.textContent = text;
     }
 
-    function addMessage(role, content, extraClass) {
+    function addMessage(role, text, isError) {
       const node = document.createElement("div");
-      node.className = ["msg", role, extraClass || ""].filter(Boolean).join(" ");
-      node.textContent = typeof content === "string" ? content : JSON.stringify(content, null, 2);
+      node.className = ["msg", role, isError ? "error" : ""].filter(Boolean).join(" ");
+      node.textContent = text;
       chatEl.appendChild(node);
       chatEl.scrollTop = chatEl.scrollHeight;
-    }
-
-    function nowIso() {
-      return new Date().toISOString();
     }
 
     function getMenuItem(itemId) {
@@ -505,63 +720,21 @@
 
     function ensureOrder() {
       if (!currentOrder) {
-        currentOrder = createEmptyOrder({});
+        currentOrder = createEmptyOrder({
+          customerName: customerNameEl.value,
+          phone: phoneEl.value,
+          orderType: orderTypeEl.value,
+          address: addressEl.value
+        });
       }
       return currentOrder;
     }
 
-    function summarizeOrder() {
-      if (!currentOrder) {
-        return { exists: false, message: "No active order" };
-      }
-
-      const lineItems = currentOrder.lines.map((line) => ({
-        lineId: line.lineId,
-        itemId: line.itemId,
-        name: line.name,
-        size: line.size,
-        quantity: line.quantity,
-        extras: line.extras.map((extra) => extra.id),
-        unitPrice: toMoney(line.unitPrice),
-        lineTotal: toMoney(line.lineTotal)
-      }));
-
-      const subtotal = toMoney(
-        currentOrder.lines.reduce((acc, line) => acc + line.lineTotal, 0)
-      );
-
-      return {
-        exists: true,
-        orderId: currentOrder.orderId,
-        createdAt: currentOrder.createdAt,
-        updatedAt: currentOrder.updatedAt,
-        status: currentOrder.status,
-        customerName: currentOrder.customerName,
-        phone: currentOrder.phone,
-        orderType: currentOrder.orderType,
-        address: currentOrder.address,
-        lines: lineItems,
-        itemCount: currentOrder.lines.reduce((acc, line) => acc + line.quantity, 0),
-        subtotal
-      };
-    }
-
-    function renderOrderPreview() {
-      const order = summarizeOrder();
-      if (!order.exists) {
-        orderPreviewEl.textContent = "No order yet. Create one with /new or create_order.";
-        return;
-      }
-      orderPreviewEl.textContent = JSON.stringify(order, null, 2);
-    }
-
     function parseSize(item, requestedSize) {
-      if (!item.priceBySize) {
-        return null;
-      }
+      if (!item.priceBySize) return null;
       const size = String(requestedSize || "medium").toLowerCase();
       if (!item.priceBySize[size]) {
-        throw new Error("Invalid size for item " + item.id + ". Use: small, medium, large.");
+        throw new Error("Invalid size for " + item.name + ". Use small, medium, or large.");
       }
       return size;
     }
@@ -569,7 +742,7 @@
     function parseQuantity(value) {
       const qty = Number(value == null ? 1 : value);
       if (!Number.isInteger(qty) || qty < 1 || qty > 20) {
-        throw new Error("Quantity must be an integer between 1 and 20.");
+        throw new Error("Quantity must be a whole number between 1 and 20.");
       }
       return qty;
     }
@@ -585,16 +758,88 @@
         .filter(Boolean);
     }
 
+    function summarizeOrder() {
+      if (!currentOrder) {
+        return { exists: false, message: "No active order" };
+      }
+
+      const lines = currentOrder.lines.map((line) => ({
+        lineId: line.lineId,
+        itemId: line.itemId,
+        name: line.name,
+        size: line.size,
+        quantity: line.quantity,
+        extras: line.extras.map((extra) => extra.id),
+        unitPrice: toMoney(line.unitPrice),
+        lineTotal: toMoney(line.lineTotal)
+      }));
+
+      const subtotal = toMoney(currentOrder.lines.reduce((sum, line) => sum + line.lineTotal, 0));
+      const itemCount = currentOrder.lines.reduce((sum, line) => sum + line.quantity, 0);
+
+      return {
+        exists: true,
+        orderId: currentOrder.orderId,
+        status: currentOrder.status,
+        customerName: currentOrder.customerName,
+        phone: currentOrder.phone,
+        orderType: currentOrder.orderType,
+        address: currentOrder.address,
+        notes: currentOrder.notes,
+        lines,
+        itemCount,
+        subtotal
+      };
+    }
+
+    function renderOrderSummary(lastBill) {
+      const order = summarizeOrder();
+      if (!order.exists) {
+        orderSummaryEl.textContent = "No active order yet.";
+        return;
+      }
+
+      const lineText = order.lines.length
+        ? order.lines.map((line) => {
+            const size = line.size ? " (" + line.size + ")" : "";
+            const extras = line.extras.length ? " + " + line.extras.join(", ") : "";
+            return line.quantity + " x " + line.name + size + extras + " = " + moneyText(line.lineTotal);
+          }).join("\n")
+        : "No items yet.";
+
+      const billText = lastBill
+        ? "\n\nTotal with tax/tip: " + moneyText(lastBill.total)
+        : "";
+
+      orderSummaryEl.textContent =
+        "Order: " + order.orderId + "\n" +
+        "Customer: " + order.customerName + "\n" +
+        "Type: " + order.orderType + (order.orderType === "delivery" && order.address ? " | " + order.address : "") + "\n" +
+        "Status: " + order.status + "\n\n" +
+        lineText +
+        "\n\nSubtotal: " + moneyText(order.subtotal) +
+        billText;
+    }
+
+    function menuLine(item) {
+      if (item.priceBySize) {
+        return item.name + " (S " + moneyText(item.priceBySize.small) + ", M " + moneyText(item.priceBySize.medium) + ", L " + moneyText(item.priceBySize.large) + ")";
+      }
+      return item.name + " (" + moneyText(item.price) + ")";
+    }
+
     function tool_get_menu(args) {
       const category = args && args.category ? String(args.category).toLowerCase() : "";
-      const items = MENU_ITEMS.filter((item) => !category || item.category === category).map((item) => ({
-        id: item.id,
-        name: item.name,
-        category: item.category,
-        description: item.description,
-        price: item.price || undefined,
-        priceBySize: item.priceBySize || undefined
-      }));
+      const items = MENU_ITEMS
+        .filter((item) => !category || item.category === category)
+        .map((item) => ({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          description: item.description,
+          price: item.price || undefined,
+          priceBySize: item.priceBySize || undefined
+        }));
 
       return {
         currency: "USD",
@@ -621,7 +866,7 @@
       const order = ensureOrder();
       const item = getMenuItem(args.itemId);
       if (!item) {
-        throw new Error("Unknown itemId: " + args.itemId);
+        throw new Error("Unknown item: " + args.itemId);
       }
 
       const size = parseSize(item, args.size);
@@ -634,13 +879,13 @@
           throw new Error("Unknown extra: " + extraId);
         }
         if (!extra.appliesTo.includes(item.category)) {
-          throw new Error("Extra " + extraId + " does not apply to category " + item.category);
+          throw new Error(extra.name + " cannot be added to " + item.category + " items.");
         }
         return extra;
       });
 
       const basePrice = item.priceBySize ? item.priceBySize[size] : item.price;
-      const extrasPrice = chosenExtras.reduce((acc, extra) => acc + extra.price, 0);
+      const extrasPrice = chosenExtras.reduce((sum, extra) => sum + extra.price, 0);
       const unitPrice = toMoney(basePrice + extrasPrice);
       const lineTotal = toMoney(unitPrice * quantity);
 
@@ -673,12 +918,12 @@
 
       const lineId = Number(args && args.lineId);
       if (!Number.isInteger(lineId) || lineId < 1) {
-        throw new Error("lineId must be a positive integer.");
+        throw new Error("lineId must be a positive number.");
       }
 
       const index = currentOrder.lines.findIndex((line) => line.lineId === lineId);
       if (index < 0) {
-        throw new Error("lineId " + lineId + " was not found in current order.");
+        throw new Error("Could not find line " + lineId + " in this order.");
       }
 
       const removed = currentOrder.lines.splice(index, 1)[0];
@@ -697,7 +942,7 @@
 
     function tool_place_order(args) {
       if (!currentOrder) {
-        throw new Error("No active order. Create one first.");
+        throw new Error("No active order. Start one first.");
       }
       if (!currentOrder.lines.length) {
         throw new Error("Cannot place an empty order.");
@@ -716,12 +961,12 @@
 
     function tool_get_bill(args) {
       if (!currentOrder) {
-        throw new Error("No active order. Create one first.");
+        throw new Error("No active order. Start one first.");
       }
 
       const tipPercentRaw = Number(args && args.tipPercent != null ? args.tipPercent : 0);
       if (!Number.isFinite(tipPercentRaw) || tipPercentRaw < 0 || tipPercentRaw > 40) {
-        throw new Error("tipPercent must be between 0 and 40.");
+        throw new Error("Tip must be between 0 and 40 percent.");
       }
 
       const summary = summarizeOrder();
@@ -762,16 +1007,24 @@
       get_bill: tool_get_bill
     };
 
-    function parseDirectJson(inputText) {
+    function runToolCall(toolName, args) {
+      const handler = TOOL_HANDLERS[String(toolName || "").trim()];
+      if (!handler) {
+        throw new Error("Unknown tool: " + toolName);
+      }
+      return handler(args || {});
+    }
+
+    function parseDirectJson(text) {
       let payload;
       try {
-        payload = JSON.parse(inputText);
+        payload = JSON.parse(text);
       } catch (_) {
         return null;
       }
 
       if (payload && typeof payload.tool === "string") {
-        return { tool: payload.tool, args: payload.arguments || {}, jsonrpcId: null };
+        return { kind: "tool", tool: payload.tool, args: payload.arguments || {} };
       }
 
       if (
@@ -782,58 +1035,41 @@
         typeof payload.params.name === "string"
       ) {
         return {
+          kind: "jsonrpc",
+          id: payload.id,
           tool: payload.params.name,
-          args: payload.params.arguments || {},
-          jsonrpcId: payload.id
+          args: payload.params.arguments || {}
         };
       }
 
       return null;
     }
 
-    function parseSlashCommand(inputText) {
-      if (!inputText.startsWith("/")) return null;
+    function parseSlashCommand(text) {
+      if (!text.startsWith("/")) return null;
 
-      const tokens = inputText.trim().split(/\s+/);
-      const command = tokens[0].toLowerCase();
+      const tokens = text.trim().split(/\s+/);
+      const cmd = tokens[0].toLowerCase();
       const rest = tokens.slice(1);
 
-      if (command === "/help") {
-        return { local: true, message: "Use /menu, /new, /add, /remove, /order, /place, /bill, /tools. JSON tool calls are also supported." };
+      if (cmd === "/menu") {
+        return { kind: "tool", tool: "get_menu", args: rest[0] ? { category: rest[0] } : {} };
       }
 
-      if (command === "/tools") {
+      if (cmd === "/new") {
         return {
-          local: true,
-          message: [
-            "Tool contract URL: /mcp-pizza/mcp-tools.json",
-            "Available tools:",
-            "- get_menu",
-            "- create_order",
-            "- add_item",
-            "- remove_item",
-            "- get_order",
-            "- place_order",
-            "- get_bill"
-          ].join("\n")
-        };
-      }
-
-      if (command === "/menu") {
-        return { tool: "get_menu", args: rest[0] ? { category: rest[0] } : {} };
-      }
-
-      if (command === "/new") {
-        return {
+          kind: "tool",
           tool: "create_order",
           args: {
-            customerName: rest.join(" ") || "Guest",
-            orderType: "pickup"
+            customerName: rest.join(" ") || customerNameEl.value || "Guest",
+            orderType: orderTypeEl.value,
+            phone: phoneEl.value,
+            address: addressEl.value
           }
         };
       }
 
-      if (command === "/add") {
+      if (cmd === "/add") {
         if (!rest.length) {
           throw new Error("Usage: /add <itemId> [size] [qty] [extra1,extra2]");
         }
@@ -853,80 +1089,230 @@
           i += 1;
         }
 
-        const extras = rest.slice(i).join(" ").split(",").map((value) => value.trim()).filter(Boolean);
+        const extras = rest.slice(i).join(" ").split(",").map((v) => v.trim()).filter(Boolean);
 
+        return { kind: "tool", tool: "add_item", args: { itemId, size, quantity, extras } };
+      }
+
+      if (cmd === "/remove") {
+        return { kind: "tool", tool: "remove_item", args: { lineId: Number(rest[0]) } };
+      }
+
+      if (cmd === "/order") {
+        return { kind: "tool", tool: "get_order", args: {} };
+      }
+
+      if (cmd === "/place") {
+        return { kind: "tool", tool: "place_order", args: { notes: rest.join(" ") } };
+      }
+
+      if (cmd === "/bill") {
+        return { kind: "tool", tool: "get_bill", args: { tipPercent: rest[0] ? Number(rest[0]) : 0 } };
+      }
+
+      if (cmd === "/help") {
         return {
-          tool: "add_item",
-          args: { itemId, size, quantity, extras }
+          kind: "local",
+          message: "Try plain language: 'I want cheese pizza', 'show menu', 'get bill'. Slash commands still work: /menu /new /add /order /bill"
         };
       }
 
-      if (command === "/remove") {
-        return { tool: "remove_item", args: { lineId: Number(rest[0]) } };
-      }
-
-      if (command === "/order") {
-        return { tool: "get_order", args: {} };
-      }
-
-      if (command === "/place") {
-        return { tool: "place_order", args: { notes: rest.join(" ") } };
-      }
-
-      if (command === "/bill") {
-        return { tool: "get_bill", args: { tipPercent: rest[0] ? Number(rest[0]) : 0 } };
-      }
-
-      throw new Error("Unknown slash command. Use /help for available commands.");
-    }
-
-    function inferSimpleIntent(inputText) {
-      const lower = inputText.toLowerCase();
-      if (lower === "menu" || lower.includes("show menu")) {
-        return { tool: "get_menu", args: {} };
-      }
-      if (lower === "order" || lower.includes("current order")) {
-        return { tool: "get_order", args: {} };
-      }
-      if (lower === "bill" || lower.includes("get bill")) {
-        return { tool: "get_bill", args: {} };
-      }
-      if (lower.includes("api") || lower.includes("tools") || lower.includes("contract")) {
-        return { local: true, message: "API description JSON: /mcp-pizza/mcp-tools.json\nUse tool format: {\"tool\":\"get_menu\",\"arguments\":{}}" };
-      }
-      return { local: true, message: "Input not recognized. Use JSON tool calls or /help for commands." };
-    }
-
-    function runToolCall(tool, args) {
-      const handler = TOOL_HANDLERS[String(tool || "").trim()];
-      if (!handler) {
-        throw new Error("Unknown tool: " + tool);
-      }
-      return handler(args || {});
-    }
-
-    function handleJsonRpcResponse(jsonrpcId, toolName, result, error) {
-      if (jsonrpcId == null) {
-        if (error) return { tool: toolName, error };
-        return { tool: toolName, result };
-      }
-
-      if (error) {
+      if (cmd === "/tools") {
         return {
-          jsonrpc: "2.0",
-          id: jsonrpcId,
-          error: {
-            code: -32000,
-            message: String(error)
+          kind: "local",
+          message: "API contract: /mcp-pizza/mcp-tools.json"
+        };
+      }
+
+      return {
+        kind: "local",
+        message: "Unknown command. Try /help or plain language like 'I want cheese pizza'."
+      };
+    }
+
+    function detectItemId(textLower) {
+      const ids = Object.keys(ITEM_KEYWORDS);
+      for (let i = 0; i < ids.length; i += 1) {
+        const itemId = ids[i];
+        const keywords = ITEM_KEYWORDS[itemId];
+        for (let j = 0; j < keywords.length; j += 1) {
+          if (textLower.includes(keywords[j])) {
+            return itemId;
+          }
+        }
+      }
+      return null;
+    }
+
+    function detectSize(textLower) {
+      if (textLower.includes("small")) return "small";
+      if (textLower.includes("large")) return "large";
+      if (textLower.includes("medium")) return "medium";
+      return undefined;
+    }
+
+    function detectQuantity(textLower) {
+      const match = textLower.match(/\b(\d{1,2})\b/);
+      if (!match) return 1;
+      const qty = Number(match[1]);
+      if (!Number.isInteger(qty) || qty < 1 || qty > 20) return 1;
+      return qty;
+    }
+
+    function detectExtras(textLower) {
+      const extras = [];
+      if (textLower.includes("extra cheese") || textLower.includes("cheese please")) {
+        extras.push("extra-cheese");
+      }
+      if (textLower.includes("basil")) extras.push("basil");
+      if (textLower.includes("olive")) extras.push("olives");
+      if (textLower.includes("jalapeno") || textLower.includes("jalape") ) extras.push("jalapeno");
+      if (textLower.includes("gluten free")) extras.push("gluten-free-crust");
+      return extras;
+    }
+
+    function inferNaturalIntent(text) {
+      const lower = text.toLowerCase().trim();
+
+      if (!lower) {
+        return { kind: "local", message: "Please type a request." };
+      }
+
+      if (lower.includes("menu") || lower.includes("what do you have")) {
+        const category = lower.includes("pizza") ? "pizza" : lower.includes("salad") ? "salad" : lower.includes("drink") ? "drink" : lower.includes("side") ? "side" : undefined;
+        return { kind: "tool", tool: "get_menu", args: category ? { category } : {} };
+      }
+
+      if (lower.includes("new order") || lower.includes("start order") || lower === "start") {
+        return {
+          kind: "tool",
+          tool: "create_order",
+          args: {
+            customerName: customerNameEl.value || "Guest",
+            phone: phoneEl.value,
+            orderType: orderTypeEl.value,
+            address: addressEl.value
+          }
+        };
+      }
+
+      if (lower.includes("bill") || lower.includes("total") || lower.includes("pay") || lower.includes("price")) {
+        const tipMatch = lower.match(/(\d{1,2})\s*%?/);
+        const tipPercent = tipMatch ? Number(tipMatch[1]) : 0;
+        return { kind: "tool", tool: "get_bill", args: { tipPercent } };
+      }
+
+      if (lower.includes("place order") || lower.includes("checkout") || lower.includes("confirm order")) {
+        return { kind: "tool", tool: "place_order", args: {} };
+      }
+
+      if (lower.includes("show order") || lower.includes("my order") || lower === "order") {
+        return { kind: "tool", tool: "get_order", args: {} };
+      }
+
+      if (lower.includes("remove")) {
+        const lineIdMatch = lower.match(/\b(\d+)\b/);
+        if (lineIdMatch) {
+          return { kind: "tool", tool: "remove_item", args: { lineId: Number(lineIdMatch[1]) } };
+        }
+      }
+
+      const itemId = detectItemId(lower);
+      if (itemId) {
+        return {
+          kind: "tool",
+          tool: "add_item",
+          args: {
+            itemId,
+            size: detectSize(lower),
+            quantity: detectQuantity(lower),
+            extras: detectExtras(lower)
           }
         };
       }
 
       return {
+        kind: "local",
+        message: "I did not catch that. Try: 'I want cheese pizza', 'show menu', or 'get my bill'."
+      };
+    }
+
+    function formatOrderLines(lines) {
+      if (!lines.length) return "No items yet.";
+      return lines.map((line) => {
+        const size = line.size ? " (" + line.size + ")" : "";
+        const extras = line.extras.length ? " + " + line.extras.join(", ") : "";
+        return "- " + line.quantity + " x " + line.name + size + extras + " = " + moneyText(line.lineTotal);
+      }).join("\n");
+    }
+
+    function toFriendlyMessage(tool, result) {
+      if (tool === "get_menu") {
+        if (!result.items.length) {
+          return "No items found for that category.";
+        }
+        const lines = result.items.map(menuLine).join("\n");
+        return "Here is the menu:\n" + lines;
+      }
+
+      if (tool === "create_order") {
+        const order = result.order;
+        return "Order " + order.orderId + " is ready for " + order.customerName + " (" + order.orderType + ").";
+      }
+
+      if (tool === "add_item") {
+        const line = result.addedLine;
+        const size = line.size ? " (" + line.size + ")" : "";
+        return "Added " + line.quantity + " x " + line.name + size + " to your order.";
+      }
+
+      if (tool === "remove_item") {
+        return "Removed line " + result.removedLine.lineId + " from your order.";
+      }
+
+      if (tool === "get_order") {
+        if (!result.exists) {
+          return "No active order yet. Start one and add items.";
+        }
+        return "Current order " + result.orderId + ":\n" + formatOrderLines(result.lines) + "\nSubtotal: " + moneyText(result.subtotal);
+      }
+
+      if (tool === "place_order") {
+        return "Order " + result.order.orderId + " has been placed.";
+      }
+
+      if (tool === "get_bill") {
+        return [
+          "Itemized bill for " + result.orderId + ":",
+          formatOrderLines(result.lines),
+          "Subtotal: " + moneyText(result.charges.subtotal),
+          "Tax: " + moneyText(result.charges.tax),
+          "Delivery fee: " + moneyText(result.charges.deliveryFee),
+          "Tip: " + moneyText(result.charges.tip),
+          "Total: " + moneyText(result.total)
+        ].join("\n");
+      }
+
+      return JSON.stringify(result, null, 2);
+    }
+
+    function formatJsonRpcResponse(id, tool, result, errorMessage) {
+      if (errorMessage) {
+        return JSON.stringify({
+          jsonrpc: "2.0",
+          id,
+          error: {
+            code: -32000,
+            message: errorMessage
+          }
+        }, null, 2);
+      }
+
+      return JSON.stringify({
         jsonrpc: "2.0",
-        id: jsonrpcId,
+        id,
         result: {
-          tool: toolName,
+          tool,
           content: [
             {
               type: "text",
@@ -934,52 +1320,174 @@
             }
           ]
         }
-      };
+      }, null, 2);
     }
 
-    async function processInput(inputText) {
-      const text = inputText.trim();
-      if (!text) {
-        return;
-      }
+    async function processInput(rawText) {
+      const text = rawText.trim();
+      if (!text) return;
 
       addMessage("user", text);
-      setStatus("Processing...");
+      setStatus("Working...");
       sendEl.disabled = true;
       promptEl.disabled = true;
 
+      let lastBill = null;
+
       try {
         let call = parseDirectJson(text);
+        if (!call) call = parseSlashCommand(text);
+        if (!call) call = inferNaturalIntent(text);
 
-        if (!call) {
-          call = parseSlashCommand(text);
-        }
-
-        if (!call) {
-          call = inferSimpleIntent(text);
-        }
-
-        if (call.local) {
+        if (call.kind === "local") {
           addMessage("assistant", call.message);
           setStatus("Ready");
           return;
         }
 
         const result = runToolCall(call.tool, call.args || {});
-        renderOrderPreview();
 
-        const responsePayload = handleJsonRpcResponse(call.jsonrpcId, call.tool, result, null);
-        addMessage("assistant", responsePayload);
+        if (call.tool === "get_bill") {
+          lastBill = result;
+        }
+
+        renderOrderSummary(lastBill);
+
+        if (call.kind === "jsonrpc") {
+          addMessage("assistant", formatJsonRpcResponse(call.id, call.tool, result, null));
+        } else {
+          addMessage("assistant", toFriendlyMessage(call.tool, result));
+        }
+
         setStatus("Ready");
       } catch (error) {
-        const normalized = error && error.message ? error.message : String(error);
-        addMessage("assistant", "Request failed: " + normalized, "error");
-        setStatus("Error");
+        const message = error && error.message ? error.message : String(error);
+        addMessage("assistant", message, true);
+        setStatus("Please try again");
       } finally {
         sendEl.disabled = false;
         promptEl.disabled = false;
         promptEl.focus();
       }
+    }
+
+    function getSelectedExtras() {
+      const checked = extrasWrapEl.querySelectorAll("input[type='checkbox']:checked");
+      return Array.from(checked).map((el) => el.value);
+    }
+
+    function renderExtrasForItem(itemId) {
+      const item = getMenuItem(itemId);
+      if (!item) {
+        extrasWrapEl.innerHTML = "";
+        return;
+      }
+
+      const options = EXTRAS.filter((extra) => extra.appliesTo.includes(item.category));
+      if (!options.length) {
+        extrasWrapEl.innerHTML = "<div class='hint'>No extras for this item.</div>";
+        return;
+      }
+
+      extrasWrapEl.innerHTML = options.map((extra) => {
+        return "<label class='extra-item'><input type='checkbox' value='" + extra.id + "'>" + extra.name + " (+" + moneyText(extra.price) + ")</label>";
+      }).join("");
+    }
+
+    function fillMenuSelect() {
+      itemSelectEl.innerHTML = MENU_ITEMS.map((item) => {
+        return "<option value='" + item.id + "'>" + item.name + "</option>";
+      }).join("");
+      renderExtrasForItem(itemSelectEl.value);
+      syncSizeInput(itemSelectEl.value);
+    }
+
+    function syncSizeInput(itemId) {
+      const item = getMenuItem(itemId);
+      const isPizza = Boolean(item && item.priceBySize);
+      sizeSelectEl.disabled = !isPizza;
+      if (!isPizza) {
+        sizeSelectEl.value = "medium";
+      }
+    }
+
+    async function startOrUpdateOrderFromForm() {
+      const args = {
+        customerName: customerNameEl.value || "Guest",
+        orderType: orderTypeEl.value,
+        phone: phoneEl.value,
+        address: addressEl.value
+      };
+      const result = runToolCall("create_order", args);
+      renderOrderSummary();
+      addMessage("assistant", toFriendlyMessage("create_order", result));
+      setStatus("Ready");
+    }
+
+    async function addItemFromForm() {
+      const args = {
+        itemId: itemSelectEl.value,
+        size: sizeSelectEl.disabled ? undefined : sizeSelectEl.value,
+        quantity: Number(qtyInputEl.value || 1),
+        extras: getSelectedExtras()
+      };
+
+      const result = runToolCall("add_item", args);
+      renderOrderSummary();
+      addMessage("assistant", toFriendlyMessage("add_item", result));
+      setStatus("Ready");
+    }
+
+    function hookQuickButtons() {
+      const buttons = document.querySelectorAll("[data-action]");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const action = btn.getAttribute("data-action");
+
+          try {
+            if (action === "menu") {
+              const result = runToolCall("get_menu", {});
+              addMessage("assistant", toFriendlyMessage("get_menu", result));
+              return;
+            }
+
+            if (action === "new-order") {
+              await startOrUpdateOrderFromForm();
+              return;
+            }
+
+            if (action === "cheese") {
+              const result = runToolCall("add_item", { itemId: "margherita", size: "medium", quantity: 1, extras: ["extra-cheese"] });
+              renderOrderSummary();
+              addMessage("assistant", toFriendlyMessage("add_item", result));
+              return;
+            }
+
+            if (action === "pepperoni") {
+              const result = runToolCall("add_item", { itemId: "pepperoni", size: "medium", quantity: 1, extras: [] });
+              renderOrderSummary();
+              addMessage("assistant", toFriendlyMessage("add_item", result));
+              return;
+            }
+
+            if (action === "order") {
+              const result = runToolCall("get_order", {});
+              renderOrderSummary();
+              addMessage("assistant", toFriendlyMessage("get_order", result));
+              return;
+            }
+
+            if (action === "bill") {
+              const result = runToolCall("get_bill", { tipPercent: 0 });
+              renderOrderSummary(result);
+              addMessage("assistant", toFriendlyMessage("get_bill", result));
+              return;
+            }
+          } catch (error) {
+            addMessage("assistant", error.message || String(error), true);
+          }
+        });
+      });
     }
 
     async function loadContractPreview() {
@@ -988,8 +1496,15 @@
         if (!response.ok) {
           throw new Error("HTTP " + response.status);
         }
+
         const data = await response.json();
-        contractPreviewEl.textContent = JSON.stringify(data, null, 2);
+        const compact = {
+          server: data.server,
+          tools: data.tools ? data.tools.map((tool) => tool.name) : [],
+          references: data.references || []
+        };
+
+        contractPreviewEl.textContent = JSON.stringify(compact, null, 2);
       } catch (error) {
         contractPreviewEl.textContent = "Could not load contract: " + (error.message || String(error));
       }
@@ -1009,12 +1524,43 @@
       }
     });
 
-    renderOrderPreview();
+    startOrderBtn.addEventListener("click", async () => {
+      try {
+        await startOrUpdateOrderFromForm();
+      } catch (error) {
+        addMessage("assistant", error.message || String(error), true);
+      }
+    });
+
+    addItemBtn.addEventListener("click", async () => {
+      try {
+        await addItemFromForm();
+      } catch (error) {
+        addMessage("assistant", error.message || String(error), true);
+      }
+    });
+
+    itemSelectEl.addEventListener("change", () => {
+      renderExtrasForItem(itemSelectEl.value);
+      syncSizeInput(itemSelectEl.value);
+    });
+
+    orderTypeEl.addEventListener("change", () => {
+      if (orderTypeEl.value === "delivery") {
+        addressEl.placeholder = "Street, city, zip";
+      } else {
+        addressEl.placeholder = "Optional for pickup";
+      }
+    });
+
+    fillMenuSelect();
+    hookQuickButtons();
+    renderOrderSummary();
     loadContractPreview();
 
     addMessage(
       "assistant",
-      "Pizza MCP chat is ready.\n\nTry:\n1) /menu\n2) /new Denis\n3) /add margherita large 2 extra-cheese,basil\n4) /bill 10\n\nAgent-style input examples:\n{\"tool\":\"get_menu\",\"arguments\":{}}\n{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"get_bill\",\"arguments\":{\"tipPercent\":12}}}"
+      "Welcome. You can type naturally now.\nTry: 'I want cheese pizza', 'show menu', or 'get my bill'."
     );
   </script>
 </body>
