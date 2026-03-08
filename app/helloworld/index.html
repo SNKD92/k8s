@@ -115,6 +115,18 @@
       flex-wrap: wrap;
     }
 
+    .explicit-link {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .explicit-link a {
+      color: var(--accent-2);
+      font-family: "IBM Plex Mono", monospace;
+      text-decoration: none;
+    }
+
     .btn {
       display: inline-block;
       text-decoration: none;
@@ -241,10 +253,12 @@
       </div>
 
       <div class="actions">
-        <a class="btn btn-primary" href="/solution.html">Read Full Solution Overview</a>
+        <a class="btn btn-primary" href="/MCP">Open Chatbot (/MCP)</a>
+        <a class="btn btn-secondary" href="/solution.html">Read Full Solution Overview</a>
         <a class="btn btn-secondary" href="/cv.pdf" target="_blank" rel="noopener noreferrer">Download CV (PDF)</a>
         <a class="btn btn-secondary" href="https://github.com/SNKD92/k8s" target="_blank" rel="noopener noreferrer">Open GitHub Repository</a>
       </div>
+      <p class="explicit-link">Direct chatbot URL: <a href="/MCP">https://deniskachar.com/MCP</a></p>
     </section>
 
     <section class="grid">
