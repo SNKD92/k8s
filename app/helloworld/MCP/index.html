@@ -66,6 +66,40 @@
       flex-wrap: wrap;
     }
 
+    .context-panel {
+      border-bottom: 1px solid var(--line);
+      background: #fbfdff;
+      padding: 10px 12px;
+    }
+
+    .context-panel details {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 8px 10px;
+    }
+
+    .context-panel summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    .context-panel textarea {
+      width: 100%;
+      margin-top: 8px;
+      min-height: 170px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      font: inherit;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
     label {
       color: var(--muted);
       font-size: 13px;
@@ -171,6 +205,33 @@
       </div>
     </header>
 
+    <section class="context-panel">
+      <details>
+        <summary>Assistant Context and Scope</summary>
+        <textarea id="systemContext">You are the MCP assistant for deniskachar.com.
+
+Your scope is strictly limited to:
+1) The NENMP platform and related implementation details.
+2) Denis Kachar's professional background, skills, and job experience.
+
+If a user asks about anything outside this scope, respond exactly:
+"I can only help with the NENMP platform and Denis Kachar's professional experience."
+
+Platform context:
+- NENMP is a Kubernetes delivery platform running on GKE.
+- Infrastructure is managed with Terraform.
+- CI/CD uses GitHub Actions with OIDC Workload Identity and deploys to Kubernetes.
+- TLS is handled by cert-manager with Cloudflare DNS challenge.
+- App traffic is served through Kubernetes Ingress.
+- LLM service runs with Ollama on a dedicated llm node pool.
+
+Professional context (editable by Denis):
+- Denis Kachar owns and operates this platform.
+- Denis has hands-on experience with Kubernetes, GKE, Terraform, CI/CD, cloud IAM, TLS, and platform operations.
+- Keep answers aligned to this profile and ask for clarification if a job-history detail is missing.</textarea>
+      </details>
+    </section>
+
     <section id="chat" class="chat" aria-live="polite"></section>
 
     <form id="form" class="composer">
@@ -187,6 +248,7 @@
     const promptEl = document.getElementById('prompt');
     const sendEl = document.getElementById('send');
     const modelEl = document.getElementById('model');
+    const systemContextEl = document.getElementById('systemContext');
     const statusEl = document.getElementById('status');
 
     const history = [];
@@ -206,10 +268,12 @@
 
     async function sendMessage(prompt) {
       const model = modelEl.value.trim() || 'llama3.2:1b';
+      const systemContext = systemContextEl.value.trim();
       pending = true;
       sendEl.disabled = true;
       promptEl.disabled = true;
       modelEl.disabled = true;
+      systemContextEl.disabled = true;
       setStatus(`Thinking with ${model}...`);
 
       addMessage('user', prompt);
@@ -222,7 +286,10 @@
           body: JSON.stringify({
             model,
             stream: false,
-            messages: history
+            messages: [
+              { role: 'system', content: systemContext },
+              ...history
+            ]
           })
         });
 
@@ -247,6 +314,7 @@
         sendEl.disabled = false;
         promptEl.disabled = false;
         modelEl.disabled = false;
+        systemContextEl.disabled = false;
         promptEl.focus();
       }
     }
