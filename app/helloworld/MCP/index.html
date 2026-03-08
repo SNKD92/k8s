@@ -66,6 +66,18 @@
       flex-wrap: wrap;
     }
 
+    .cv-link {
+      display: inline-block;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #173a84;
+      background: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
     .context-panel {
       border-bottom: 1px solid var(--line);
       background: #fbfdff;
@@ -277,6 +289,7 @@
       <div class="controls">
         <label for="model">Model</label>
         <input id="model" type="text" value="llama3.2:1b" autocomplete="off">
+        <a class="cv-link" href="/cv.pdf" target="_blank" rel="noopener noreferrer">CV PDF</a>
       </div>
     </header>
 
