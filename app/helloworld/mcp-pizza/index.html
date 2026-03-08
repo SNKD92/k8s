@@ -526,12 +526,29 @@
             <button class="quick-btn" type="button" data-action="pickup">Switch to Pickup</button>
             <button class="quick-btn" type="button" data-action="order">View Order</button>
             <button class="quick-btn" type="button" data-action="bill">Get Bill</button>
+            <button class="quick-btn" type="button" data-action="track">Track Last Order</button>
+            <button class="quick-btn" type="button" data-action="history">Order History</button>
           </div>
         </section>
 
         <section class="card">
           <h3>Current Order</h3>
           <div id="orderSummary" class="summary">No active order yet.</div>
+        </section>
+
+        <section class="card">
+          <h3>Order Tracking</h3>
+          <p class="hint">Use order ID to check status and recent orders.</p>
+          <div class="row">
+            <div>
+              <label for="trackOrderId">Order ID</label>
+              <input id="trackOrderId" type="text" placeholder="PZ-1001">
+            </div>
+            <div style="align-self: end;">
+              <button id="trackOrderBtn" class="small-btn" type="button" style="width: 100%;">Track Order</button>
+            </div>
+          </div>
+          <div id="historySummary" class="summary">No placed orders yet.</div>
         </section>
 
         <details class="card advanced">
@@ -658,9 +675,15 @@
     const addItemBtn = document.getElementById("addItemBtn");
 
     const orderSummaryEl = document.getElementById("orderSummary");
+    const trackOrderIdEl = document.getElementById("trackOrderId");
+    const trackOrderBtn = document.getElementById("trackOrderBtn");
+    const historySummaryEl = document.getElementById("historySummary");
     const contractPreviewEl = document.getElementById("contractPreview");
 
+    const STORAGE_KEY = "pizza_mcp_demo_state_v1";
+
     let currentOrder = null;
+    let archivedOrders = [];
     let orderSeq = 1000;
     let lineSeq = 1;
 
@@ -678,6 +701,56 @@
 
     function nowIso() {
       return new Date().toISOString();
+    }
+
+    function persistState() {
+      try {
+        const payload = {
+          orderSeq,
+          lineSeq,
+          currentOrder,
+          archivedOrders
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      } catch (_) {
+        // Ignore storage write failures in demo mode.
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          orderSeq = Number.isInteger(parsed.orderSeq) ? parsed.orderSeq : orderSeq;
+          lineSeq = Number.isInteger(parsed.lineSeq) ? parsed.lineSeq : lineSeq;
+          currentOrder = parsed.currentOrder && typeof parsed.currentOrder === "object" ? parsed.currentOrder : null;
+          archivedOrders = Array.isArray(parsed.archivedOrders) ? parsed.archivedOrders : [];
+        }
+      } catch (_) {
+        // Ignore storage read failures in demo mode.
+      }
+    }
+
+    function upsertArchivedOrder(order, statusOverride) {
+      if (!order || !order.orderId) return;
+      const snapshot = clone(order);
+      if (statusOverride) {
+        snapshot.status = statusOverride;
+      }
+      snapshot.trackedAt = nowIso();
+
+      const index = archivedOrders.findIndex((entry) => entry.orderId === snapshot.orderId);
+      if (index >= 0) {
+        archivedOrders[index] = snapshot;
+      } else {
+        archivedOrders.unshift(snapshot);
+      }
+
+      if (archivedOrders.length > 50) {
+        archivedOrders = archivedOrders.slice(0, 50);
+      }
     }
 
     function setStatus(text) {
@@ -730,6 +803,7 @@
           orderType: orderTypeEl.value,
           address: addressEl.value
         });
+        persistState();
       }
       return currentOrder;
     }
@@ -825,6 +899,75 @@
         billText;
     }
 
+    function findOrderById(orderId) {
+      const normalized = String(orderId || "").trim().toUpperCase();
+      if (!normalized) return null;
+      if (currentOrder && currentOrder.orderId === normalized) {
+        return currentOrder;
+      }
+      return archivedOrders.find((order) => order.orderId === normalized) || null;
+    }
+
+    function latestTrackedOrder() {
+      if (currentOrder && currentOrder.lines && currentOrder.lines.length) {
+        return currentOrder;
+      }
+      return archivedOrders.length ? archivedOrders[0] : null;
+    }
+
+    function trackingStage(order) {
+      const baseIso = order.updatedAt || order.createdAt;
+      const baseTime = new Date(baseIso).getTime();
+      const now = Date.now();
+      const elapsedMinutes = baseTime > 0 ? Math.max(0, Math.floor((now - baseTime) / 60000)) : 0;
+
+      if (order.status === "draft") {
+        return {
+          stage: "draft",
+          label: "Draft",
+          message: "Order is not placed yet."
+        };
+      }
+
+      if (order.status === "placed") {
+        if (order.orderType === "delivery") {
+          if (elapsedMinutes < 3) return { stage: "confirmed", label: "Confirmed", message: "Order confirmed by kitchen.", etaMinutes: 25 };
+          if (elapsedMinutes < 10) return { stage: "preparing", label: "Preparing", message: "Chef is preparing your order.", etaMinutes: 18 };
+          if (elapsedMinutes < 18) return { stage: "baking", label: "Baking", message: "Pizza is in the oven.", etaMinutes: 10 };
+          if (elapsedMinutes < 28) return { stage: "on-the-way", label: "Out for Delivery", message: "Courier is on the way.", etaMinutes: 4 };
+          return { stage: "delivered", label: "Delivered", message: "Order was delivered. Enjoy." };
+        }
+
+        if (elapsedMinutes < 3) return { stage: "confirmed", label: "Confirmed", message: "Order confirmed by kitchen.", etaMinutes: 16 };
+        if (elapsedMinutes < 10) return { stage: "preparing", label: "Preparing", message: "Chef is preparing your order.", etaMinutes: 10 };
+        if (elapsedMinutes < 16) return { stage: "baking", label: "Baking", message: "Pizza is in the oven.", etaMinutes: 4 };
+        return { stage: "ready", label: "Ready for Pickup", message: "Order is ready for pickup." };
+      }
+
+      return {
+        stage: String(order.status || "unknown"),
+        label: String(order.status || "Unknown"),
+        message: "Status available."
+      };
+    }
+
+    function renderHistorySummary() {
+      if (!archivedOrders.length) {
+        historySummaryEl.textContent = "No placed orders yet.";
+        return;
+      }
+
+      const lines = archivedOrders.slice(0, 5).map((order) => {
+        const track = trackingStage(order);
+        const itemCount = Array.isArray(order.lines)
+          ? order.lines.reduce((sum, line) => sum + Number(line.quantity || 0), 0)
+          : 0;
+        return order.orderId + " | " + track.label + " | " + itemCount + " items";
+      });
+
+      historySummaryEl.textContent = lines.join("\n");
+    }
+
     function menuLine(item) {
       if (item.priceBySize) {
         return item.name + " (S " + moneyText(item.priceBySize.small) + ", M " + moneyText(item.priceBySize.medium) + ", L " + moneyText(item.priceBySize.large) + ")";
@@ -856,6 +999,7 @@
     function tool_create_order(args) {
       currentOrder = createEmptyOrder(args || {});
       lineSeq = 1;
+      persistState();
       return {
         message: "Order created",
         order: summarizeOrder()
@@ -959,6 +1103,10 @@
     function replaceLine(index, line) {
       currentOrder.lines[index] = line;
       currentOrder.updatedAt = nowIso();
+      if (currentOrder.status === "placed") {
+        upsertArchivedOrder(currentOrder);
+      }
+      persistState();
       return line;
     }
 
@@ -980,6 +1128,10 @@
       }
 
       order.updatedAt = nowIso();
+      if (order.status === "placed") {
+        upsertArchivedOrder(order);
+      }
+      persistState();
 
       return {
         message: "Order details updated",
@@ -993,6 +1145,10 @@
       lineSeq += 1;
       order.lines.push(line);
       order.updatedAt = nowIso();
+      if (order.status === "placed") {
+        upsertArchivedOrder(order);
+      }
+      persistState();
 
       return {
         message: "Item added",
@@ -1119,6 +1275,10 @@
 
       const removed = currentOrder.lines.splice(index, 1)[0];
       currentOrder.updatedAt = nowIso();
+      if (currentOrder.status === "placed") {
+        upsertArchivedOrder(currentOrder);
+      }
+      persistState();
 
       return {
         message: "Item removed",
@@ -1143,6 +1303,8 @@
       currentOrder.status = "placed";
       currentOrder.notes = notes;
       currentOrder.updatedAt = nowIso();
+      upsertArchivedOrder(currentOrder, "placed");
+      persistState();
 
       return {
         message: "Order placed",
@@ -1188,6 +1350,59 @@
       };
     }
 
+    function tool_track_order(args) {
+      const payload = args || {};
+      const explicitOrderId = payload.orderId ? String(payload.orderId).toUpperCase() : "";
+      const order = explicitOrderId ? findOrderById(explicitOrderId) : latestTrackedOrder();
+      if (!order) {
+        throw new Error("No order found. Create and place an order first.");
+      }
+
+      const track = trackingStage(order);
+      const lineCount = Array.isArray(order.lines) ? order.lines.length : 0;
+      const itemCount = Array.isArray(order.lines)
+        ? order.lines.reduce((sum, line) => sum + Number(line.quantity || 0), 0)
+        : 0;
+
+      return {
+        orderId: order.orderId,
+        status: order.status,
+        tracking: track,
+        orderType: order.orderType,
+        customerName: order.customerName,
+        lineCount,
+        itemCount,
+        updatedAt: order.updatedAt || order.createdAt
+      };
+    }
+
+    function tool_list_orders(args) {
+      const payload = args || {};
+      const limitRaw = Number(payload.limit == null ? 5 : payload.limit);
+      const limit = Number.isInteger(limitRaw) ? Math.max(1, Math.min(20, limitRaw)) : 5;
+
+      const entries = archivedOrders.slice(0, limit).map((order) => {
+        const track = trackingStage(order);
+        const itemCount = Array.isArray(order.lines)
+          ? order.lines.reduce((sum, line) => sum + Number(line.quantity || 0), 0)
+          : 0;
+        return {
+          orderId: order.orderId,
+          status: order.status,
+          tracking: track,
+          orderType: order.orderType,
+          customerName: order.customerName,
+          itemCount,
+          updatedAt: order.updatedAt || order.createdAt
+        };
+      });
+
+      return {
+        count: entries.length,
+        orders: entries
+      };
+    }
+
     const TOOL_HANDLERS = {
       get_menu: tool_get_menu,
       create_order: tool_create_order,
@@ -1198,6 +1413,8 @@
       remove_extras: tool_remove_extras,
       remove_item: tool_remove_item,
       get_order: tool_get_order,
+      track_order: tool_track_order,
+      list_orders: tool_list_orders,
       place_order: tool_place_order,
       get_bill: tool_get_bill
     };
@@ -1418,6 +1635,16 @@
         return { kind: "tool", tool: "get_order", args: {} };
       }
 
+      if (cmd === "/track") {
+        const orderId = rest[0] || trackOrderIdEl.value;
+        return { kind: "tool", tool: "track_order", args: orderId ? { orderId } : {} };
+      }
+
+      if (cmd === "/history") {
+        const limit = rest[0] && /^\d+$/.test(rest[0]) ? Number(rest[0]) : 5;
+        return { kind: "tool", tool: "list_orders", args: { limit } };
+      }
+
       if (cmd === "/place") {
         return { kind: "tool", tool: "place_order", args: { notes: rest.join(" ") } };
       }
@@ -1429,7 +1656,7 @@
       if (cmd === "/help") {
         return {
           kind: "local",
-          message: "Try plain language: 'add olives on my pizza', 'make it large', 'set delivery to 123 Main St'. Slash commands: /menu /new /add /extra /noextra /size /qty /delivery /pickup /order /bill"
+          message: "Try plain language: 'add olives on my pizza', 'make it large', 'set delivery to 123 Main St'. Slash commands: /menu /new /add /extra /noextra /size /qty /delivery /pickup /order /track /history /bill"
         };
       }
 
@@ -1516,6 +1743,12 @@
       return "";
     }
 
+    function extractOrderId(rawText) {
+      const match = String(rawText || "").match(/\bPZ-\d+\b/i);
+      if (match) return match[0].toUpperCase();
+      return "";
+    }
+
     function inferNaturalIntent(text) {
       const raw = String(text || "").trim();
       const lower = raw.toLowerCase().trim();
@@ -1583,6 +1816,15 @@
 
       if (lower.includes("place order") || lower.includes("checkout") || lower.includes("confirm order")) {
         return { kind: "tool", tool: "place_order", args: {} };
+      }
+
+      if (lower.includes("history") || lower.includes("recent orders") || lower.includes("previous orders")) {
+        return { kind: "tool", tool: "list_orders", args: { limit: 5 } };
+      }
+
+      if (lower.includes("where is my order") || lower.includes("track") || lower.includes("status")) {
+        const orderId = extractOrderId(raw) || trackOrderIdEl.value;
+        return { kind: "tool", tool: "track_order", args: orderId ? { orderId } : {} };
       }
 
       if (lower.includes("show order") || lower.includes("my order") || lower === "order") {
@@ -1732,8 +1974,23 @@
         return "Current order " + result.orderId + ":\n" + formatOrderLines(result.lines) + "\nSubtotal: " + moneyText(result.subtotal);
       }
 
+      if (tool === "track_order") {
+        const eta = result.tracking.etaMinutes != null ? " | ETA " + result.tracking.etaMinutes + " min" : "";
+        return "Order " + result.orderId + " status: " + result.tracking.label + ". " + result.tracking.message + eta;
+      }
+
+      if (tool === "list_orders") {
+        if (!result.orders || !result.orders.length) {
+          return "No placed orders in history yet.";
+        }
+        const lines = result.orders.map((entry) => {
+          return "- " + entry.orderId + " | " + entry.tracking.label + " | " + entry.orderType;
+        }).join("\n");
+        return "Recent orders:\n" + lines;
+      }
+
       if (tool === "place_order") {
-        return "Order " + result.order.orderId + " has been placed.";
+        return "Order " + result.order.orderId + " has been placed. You can ask: 'track " + result.order.orderId + "'.";
       }
 
       if (tool === "get_bill") {
@@ -1806,7 +2063,16 @@
           lastBill = result;
         }
 
+        if (call.tool === "place_order" && result && result.order && result.order.orderId) {
+          trackOrderIdEl.value = result.order.orderId;
+        } else if (call.tool === "track_order" && result && result.orderId) {
+          trackOrderIdEl.value = result.orderId;
+        } else if (call.tool === "create_order" && result && result.order && result.order.orderId) {
+          trackOrderIdEl.value = result.order.orderId;
+        }
+
         renderOrderSummary(lastBill);
+        renderHistorySummary();
 
         if (call.kind === "jsonrpc") {
           addMessage("assistant", formatJsonRpcResponse(call.id, call.tool, result, null));
@@ -1874,7 +2140,9 @@
         address: addressEl.value
       };
       const result = runToolCall("create_order", args);
+      trackOrderIdEl.value = result.order.orderId;
       renderOrderSummary();
+      renderHistorySummary();
       addMessage("assistant", toFriendlyMessage("create_order", result));
       setStatus("Ready");
     }
@@ -1889,8 +2157,23 @@
 
       const result = runToolCall("add_item", args);
       renderOrderSummary();
+      renderHistorySummary();
       addMessage("assistant", toFriendlyMessage("add_item", result));
       setStatus("Ready");
+    }
+
+    function syncFormFromCurrentOrder() {
+      if (currentOrder) {
+        if (currentOrder.customerName) customerNameEl.value = currentOrder.customerName;
+        if (currentOrder.phone) phoneEl.value = currentOrder.phone;
+        if (currentOrder.orderType) orderTypeEl.value = currentOrder.orderType;
+        if (currentOrder.address) addressEl.value = currentOrder.address;
+        trackOrderIdEl.value = currentOrder.orderId || "";
+        return;
+      }
+      if (archivedOrders.length) {
+        trackOrderIdEl.value = archivedOrders[0].orderId || "";
+      }
     }
 
     function hookQuickButtons() {
@@ -1914,6 +2197,7 @@
             if (action === "cheese") {
               const result = runToolCall("add_item", { itemId: "margherita", size: "medium", quantity: 1, extras: ["extra-cheese"] });
               renderOrderSummary();
+              renderHistorySummary();
               addMessage("assistant", toFriendlyMessage("add_item", result));
               return;
             }
@@ -1921,6 +2205,7 @@
             if (action === "pepperoni") {
               const result = runToolCall("add_item", { itemId: "pepperoni", size: "medium", quantity: 1, extras: [] });
               renderOrderSummary();
+              renderHistorySummary();
               addMessage("assistant", toFriendlyMessage("add_item", result));
               return;
             }
@@ -1928,6 +2213,7 @@
             if (action === "olives-last") {
               const result = runToolCall("add_extras", { extras: ["olives"], preferPizza: true });
               renderOrderSummary();
+              renderHistorySummary();
               addMessage("assistant", toFriendlyMessage("add_extras", result));
               return;
             }
@@ -1935,6 +2221,7 @@
             if (action === "size-large") {
               const result = runToolCall("update_item", { size: "large", preferPizza: true });
               renderOrderSummary();
+              renderHistorySummary();
               addMessage("assistant", toFriendlyMessage("update_item", result));
               return;
             }
@@ -1942,6 +2229,7 @@
             if (action === "delivery") {
               const result = runToolCall("update_order_details", { orderType: "delivery", address: addressEl.value });
               renderOrderSummary();
+              renderHistorySummary();
               addMessage("assistant", toFriendlyMessage("update_order_details", result));
               return;
             }
@@ -1949,6 +2237,7 @@
             if (action === "pickup") {
               const result = runToolCall("update_order_details", { orderType: "pickup" });
               renderOrderSummary();
+              renderHistorySummary();
               addMessage("assistant", toFriendlyMessage("update_order_details", result));
               return;
             }
@@ -1956,6 +2245,7 @@
             if (action === "order") {
               const result = runToolCall("get_order", {});
               renderOrderSummary();
+              renderHistorySummary();
               addMessage("assistant", toFriendlyMessage("get_order", result));
               return;
             }
@@ -1963,7 +2253,23 @@
             if (action === "bill") {
               const result = runToolCall("get_bill", { tipPercent: 0 });
               renderOrderSummary(result);
+              renderHistorySummary();
               addMessage("assistant", toFriendlyMessage("get_bill", result));
+              return;
+            }
+
+            if (action === "track") {
+              const result = runToolCall("track_order", trackOrderIdEl.value ? { orderId: trackOrderIdEl.value } : {});
+              trackOrderIdEl.value = result.orderId;
+              renderHistorySummary();
+              addMessage("assistant", toFriendlyMessage("track_order", result));
+              return;
+            }
+
+            if (action === "history") {
+              const result = runToolCall("list_orders", { limit: 5 });
+              renderHistorySummary();
+              addMessage("assistant", toFriendlyMessage("list_orders", result));
               return;
             }
           } catch (error) {
@@ -2023,6 +2329,17 @@
       }
     });
 
+    trackOrderBtn.addEventListener("click", () => {
+      try {
+        const result = runToolCall("track_order", trackOrderIdEl.value ? { orderId: trackOrderIdEl.value } : {});
+        trackOrderIdEl.value = result.orderId;
+        renderHistorySummary();
+        addMessage("assistant", toFriendlyMessage("track_order", result));
+      } catch (error) {
+        addMessage("assistant", error.message || String(error), true);
+      }
+    });
+
     itemSelectEl.addEventListener("change", () => {
       renderExtrasForItem(itemSelectEl.value);
       syncSizeInput(itemSelectEl.value);
@@ -2036,14 +2353,17 @@
       }
     });
 
+    loadState();
     fillMenuSelect();
+    syncFormFromCurrentOrder();
     hookQuickButtons();
     renderOrderSummary();
+    renderHistorySummary();
     loadContractPreview();
 
     addMessage(
       "assistant",
-      "Welcome. You can type naturally now.\nTry: 'I want cheese pizza', 'add olives on my pizza', 'make it large', or 'set delivery to 123 Main St'."
+      "Welcome. You can type naturally now.\nTry: 'I want cheese pizza', 'add olives on my pizza', 'make it large', 'set delivery to 123 Main St', or 'track my order'."
     );
   </script>
 </body>

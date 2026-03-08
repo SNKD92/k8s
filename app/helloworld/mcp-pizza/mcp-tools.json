@@ -10,7 +10,8 @@
     "notes": [
       "This is a static MCP-ready demo: tools are executed in-browser for quick testing.",
       "Agents can inspect this contract and submit tool calls through the chat input in JSON format.",
-      "The web UI also supports low-tech natural-language ordering and one-click actions."
+      "The web UI also supports low-tech natural-language ordering and one-click actions.",
+      "Order tracking history is stored in browser localStorage for demo persistence."
     ]
   },
   "references": [
@@ -202,6 +203,32 @@
       "inputSchema": {
         "type": "object",
         "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "track_order",
+      "description": "Track an order by orderId. If omitted, latest active/tracked order is used.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "orderId": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "list_orders",
+      "description": "List recent tracked orders from local demo history.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          }
+        },
         "additionalProperties": false
       }
     },
