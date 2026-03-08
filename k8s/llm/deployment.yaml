@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      nodeSelector:
+        workload: llm
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: llm
+        effect: NoSchedule
+      containers:
+      - name: ollama
+        image: ollama/ollama:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 11434
+        env:
+        - name: OLLAMA_HOST
+          value: 0.0.0.0:11434
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "8Gi"
+          limits:
+            cpu: "3500m"
+            memory: "12Gi"
+        readinessProbe:
+          httpGet:
+            path: /api/tags
+            port: 11434
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /api/tags
+            port: 11434
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          timeoutSeconds: 3
+          failureThreshold: 6
+        volumeMounts:
+        - name: ollama-models
+          mountPath: /root/.ollama
+      volumes:
+      - name: ollama-models
+        persistentVolumeClaim:
+          claimName: ollama-models-pvc
