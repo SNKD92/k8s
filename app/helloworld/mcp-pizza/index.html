@@ -448,7 +448,7 @@
       <section class="panel" aria-label="Chat panel">
         <div id="chat" class="chat" aria-live="polite"></div>
         <form id="form" class="composer">
-          <textarea id="prompt" placeholder="Ask naturally: I want cheese pizza, show menu, get my bill" required></textarea>
+          <textarea id="prompt" placeholder="Ask naturally: I want cheese pizza, add olives on my pizza, make it large, get my bill" required></textarea>
           <button id="send" class="send" type="submit">Send</button>
         </form>
         <div id="status" class="status">Ready</div>
@@ -520,6 +520,10 @@
             <button class="quick-btn" type="button" data-action="new-order">New Order</button>
             <button class="quick-btn" type="button" data-action="cheese">Add Cheese Pizza</button>
             <button class="quick-btn" type="button" data-action="pepperoni">Add Pepperoni</button>
+            <button class="quick-btn" type="button" data-action="olives-last">Add Olives to Last Pizza</button>
+            <button class="quick-btn" type="button" data-action="size-large">Make Last Pizza Large</button>
+            <button class="quick-btn" type="button" data-action="delivery">Switch to Delivery</button>
+            <button class="quick-btn" type="button" data-action="pickup">Switch to Pickup</button>
             <button class="quick-btn" type="button" data-action="order">View Order</button>
             <button class="quick-btn" type="button" data-action="bill">Get Bill</button>
           </div>
@@ -858,22 +862,19 @@
       };
     }
 
-    function tool_add_item(args) {
-      if (!args || !args.itemId) {
-        throw new Error("itemId is required.");
-      }
+    function resolveExtrasForItem(item, extraIds) {
+      const normalized = normalizeExtras(extraIds);
+      const uniqueIds = [];
+      const seen = new Set();
 
-      const order = ensureOrder();
-      const item = getMenuItem(args.itemId);
-      if (!item) {
-        throw new Error("Unknown item: " + args.itemId);
-      }
+      normalized.forEach((extraId) => {
+        if (!seen.has(extraId)) {
+          seen.add(extraId);
+          uniqueIds.push(extraId);
+        }
+      });
 
-      const size = parseSize(item, args.size);
-      const quantity = parseQuantity(args.quantity);
-      const extraIds = normalizeExtras(args.extras);
-
-      const chosenExtras = extraIds.map((extraId) => {
+      return uniqueIds.map((extraId) => {
         const extra = getExtra(extraId);
         if (!extra) {
           throw new Error("Unknown extra: " + extraId);
@@ -883,14 +884,16 @@
         }
         return extra;
       });
+    }
 
+    function buildLine(item, size, quantity, chosenExtras, lineIdValue) {
       const basePrice = item.priceBySize ? item.priceBySize[size] : item.price;
       const extrasPrice = chosenExtras.reduce((sum, extra) => sum + extra.price, 0);
       const unitPrice = toMoney(basePrice + extrasPrice);
       const lineTotal = toMoney(unitPrice * quantity);
 
-      const line = {
-        lineId: lineSeq,
+      return {
+        lineId: lineIdValue,
         itemId: item.id,
         name: item.name,
         size,
@@ -899,7 +902,94 @@
         unitPrice,
         lineTotal
       };
+    }
 
+    function createLineFromArgs(args, lineIdValue) {
+      if (!args || !args.itemId) {
+        throw new Error("itemId is required.");
+      }
+
+      const item = getMenuItem(args.itemId);
+      if (!item) {
+        throw new Error("Unknown item: " + args.itemId);
+      }
+
+      const size = parseSize(item, args.size);
+      const quantity = parseQuantity(args.quantity);
+      const chosenExtras = resolveExtrasForItem(item, args.extras);
+      return buildLine(item, size, quantity, chosenExtras, lineIdValue);
+    }
+
+    function findEditableLine(args) {
+      if (!currentOrder || !currentOrder.lines.length) {
+        throw new Error("No active order items to update.");
+      }
+
+      const lineId = args && args.lineId != null ? Number(args.lineId) : null;
+      if (lineId != null && Number.isInteger(lineId) && lineId > 0) {
+        const index = currentOrder.lines.findIndex((line) => line.lineId === lineId);
+        if (index < 0) {
+          throw new Error("Could not find line " + lineId + " in this order.");
+        }
+        return { index, line: currentOrder.lines[index] };
+      }
+
+      if (args && args.itemId) {
+        const itemId = String(args.itemId).toLowerCase();
+        for (let i = currentOrder.lines.length - 1; i >= 0; i -= 1) {
+          if (currentOrder.lines[i].itemId === itemId) {
+            return { index: i, line: currentOrder.lines[i] };
+          }
+        }
+      }
+
+      if (args && args.preferPizza) {
+        for (let i = currentOrder.lines.length - 1; i >= 0; i -= 1) {
+          const menuItem = getMenuItem(currentOrder.lines[i].itemId);
+          if (menuItem && menuItem.category === "pizza") {
+            return { index: i, line: currentOrder.lines[i] };
+          }
+        }
+      }
+
+      const lastIndex = currentOrder.lines.length - 1;
+      return { index: lastIndex, line: currentOrder.lines[lastIndex] };
+    }
+
+    function replaceLine(index, line) {
+      currentOrder.lines[index] = line;
+      currentOrder.updatedAt = nowIso();
+      return line;
+    }
+
+    function tool_update_order_details(args) {
+      const order = ensureOrder();
+      const payload = args || {};
+
+      if (payload.customerName != null) {
+        order.customerName = String(payload.customerName).trim() || "Guest";
+      }
+      if (payload.phone != null) {
+        order.phone = String(payload.phone).trim();
+      }
+      if (payload.orderType != null) {
+        order.orderType = normalizeOrderType(payload.orderType);
+      }
+      if (payload.address != null) {
+        order.address = String(payload.address).trim();
+      }
+
+      order.updatedAt = nowIso();
+
+      return {
+        message: "Order details updated",
+        order: summarizeOrder()
+      };
+    }
+
+    function tool_add_item(args) {
+      const order = ensureOrder();
+      const line = createLineFromArgs(args, lineSeq);
       lineSeq += 1;
       order.lines.push(line);
       order.updatedAt = nowIso();
@@ -907,6 +997,107 @@
       return {
         message: "Item added",
         addedLine: clone(line),
+        order: summarizeOrder()
+      };
+    }
+
+    function tool_update_item(args) {
+      const payload = args || {};
+      const target = findEditableLine(payload);
+      const currentLine = target.line;
+
+      if (
+        payload.itemId == null &&
+        payload.size == null &&
+        payload.quantity == null &&
+        payload.extras == null
+      ) {
+        throw new Error("Please provide at least one field to update.");
+      }
+
+      const nextItemId = payload.itemId != null ? payload.itemId : currentLine.itemId;
+      const nextSize = payload.size != null ? payload.size : currentLine.size;
+      const nextQuantity = payload.quantity != null ? payload.quantity : currentLine.quantity;
+      const nextExtras = payload.extras != null
+        ? payload.extras
+        : currentLine.extras.map((extra) => extra.id);
+
+      const updatedLine = createLineFromArgs(
+        {
+          itemId: nextItemId,
+          size: nextSize,
+          quantity: nextQuantity,
+          extras: nextExtras
+        },
+        currentLine.lineId
+      );
+
+      replaceLine(target.index, updatedLine);
+
+      return {
+        message: "Item updated",
+        updatedLine: clone(updatedLine),
+        order: summarizeOrder()
+      };
+    }
+
+    function tool_add_extras(args) {
+      const payload = args || {};
+      const incoming = normalizeExtras(payload.extras);
+      if (!incoming.length) {
+        throw new Error("Please provide extras to add.");
+      }
+
+      const target = findEditableLine(payload);
+      const existing = target.line.extras.map((extra) => extra.id);
+      const merged = existing.concat(incoming);
+
+      const updatedLine = createLineFromArgs(
+        {
+          itemId: target.line.itemId,
+          size: target.line.size,
+          quantity: target.line.quantity,
+          extras: merged
+        },
+        target.line.lineId
+      );
+
+      replaceLine(target.index, updatedLine);
+
+      return {
+        message: "Extras added",
+        updatedLine: clone(updatedLine),
+        order: summarizeOrder()
+      };
+    }
+
+    function tool_remove_extras(args) {
+      const payload = args || {};
+      const toRemove = new Set(normalizeExtras(payload.extras));
+      if (!toRemove.size) {
+        throw new Error("Please provide extras to remove.");
+      }
+
+      const target = findEditableLine(payload);
+      const remaining = target.line.extras
+        .map((extra) => extra.id)
+        .filter((extraId) => !toRemove.has(extraId));
+
+      const updatedLine = createLineFromArgs(
+        {
+          itemId: target.line.itemId,
+          size: target.line.size,
+          quantity: target.line.quantity,
+          extras: remaining
+        },
+        target.line.lineId
+      );
+
+      replaceLine(target.index, updatedLine);
+
+      return {
+        message: "Extras removed",
+        updatedLine: clone(updatedLine),
         order: summarizeOrder()
       };
     }
@@ -1000,7 +1191,11 @@
     const TOOL_HANDLERS = {
       get_menu: tool_get_menu,
       create_order: tool_create_order,
+      update_order_details: tool_update_order_details,
       add_item: tool_add_item,
+      update_item: tool_update_item,
+      add_extras: tool_add_extras,
+      remove_extras: tool_remove_extras,
       remove_item: tool_remove_item,
       get_order: tool_get_order,
       place_order: tool_place_order,
@@ -1094,8 +1289,129 @@
         return { kind: "tool", tool: "add_item", args: { itemId, size, quantity, extras } };
       }
 
+      if (cmd === "/extra") {
+        if (!rest.length) {
+          throw new Error("Usage: /extra [lineId] <extra1,extra2>");
+        }
+
+        let lineId;
+        let extraText = rest.join(" ");
+        if (/^\d+$/.test(rest[0])) {
+          lineId = Number(rest[0]);
+          extraText = rest.slice(1).join(" ");
+        }
+
+        const detected = detectExtras(extraText.toLowerCase());
+        const extras = detected.length ? detected : extraText.split(",").map((v) => v.trim()).filter(Boolean);
+        if (!extras.length) {
+          throw new Error("Please specify extras, for example: /extra olives,basil");
+        }
+        return { kind: "tool", tool: "add_extras", args: { lineId, extras, preferPizza: true } };
+      }
+
+      if (cmd === "/noextra") {
+        if (!rest.length) {
+          throw new Error("Usage: /noextra [lineId] <extra1,extra2>");
+        }
+
+        let lineId;
+        let extraText = rest.join(" ");
+        if (/^\d+$/.test(rest[0])) {
+          lineId = Number(rest[0]);
+          extraText = rest.slice(1).join(" ");
+        }
+
+        const detected = detectExtras(extraText.toLowerCase());
+        const extras = detected.length ? detected : extraText.split(",").map((v) => v.trim()).filter(Boolean);
+        if (!extras.length) {
+          throw new Error("Please specify extras to remove.");
+        }
+        return { kind: "tool", tool: "remove_extras", args: { lineId, extras, preferPizza: true } };
+      }
+
+      if (cmd === "/size") {
+        if (!rest.length) {
+          throw new Error("Usage: /size [lineId] <small|medium|large>");
+        }
+        let lineId;
+        let sizeToken = rest[0];
+        if (/^\d+$/.test(rest[0])) {
+          lineId = Number(rest[0]);
+          sizeToken = rest[1];
+        }
+        if (!sizeToken || !["small", "medium", "large"].includes(String(sizeToken).toLowerCase())) {
+          throw new Error("Size must be small, medium, or large.");
+        }
+        return { kind: "tool", tool: "update_item", args: { lineId, size: String(sizeToken).toLowerCase(), preferPizza: true } };
+      }
+
+      if (cmd === "/qty") {
+        if (!rest.length) {
+          throw new Error("Usage: /qty [lineId] <quantity>");
+        }
+        let lineId;
+        let quantityToken = rest[0];
+        if (/^\d+$/.test(rest[0]) && rest[1]) {
+          lineId = Number(rest[0]);
+          quantityToken = rest[1];
+        }
+        const quantity = Number(quantityToken);
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
+          throw new Error("Quantity must be a whole number between 1 and 20.");
+        }
+        return { kind: "tool", tool: "update_item", args: { lineId, quantity, preferPizza: true } };
+      }
+
+      if (cmd === "/delivery") {
+        return {
+          kind: "tool",
+          tool: "update_order_details",
+          args: {
+            orderType: "delivery",
+            address: rest.join(" ") || addressEl.value
+          }
+        };
+      }
+
+      if (cmd === "/pickup") {
+        return {
+          kind: "tool",
+          tool: "update_order_details",
+          args: {
+            orderType: "pickup"
+          }
+        };
+      }
+
+      if (cmd === "/name") {
+        return {
+          kind: "tool",
+          tool: "update_order_details",
+          args: {
+            customerName: rest.join(" ") || customerNameEl.value || "Guest"
+          }
+        };
+      }
+
+      if (cmd === "/phone") {
+        return {
+          kind: "tool",
+          tool: "update_order_details",
+          args: {
+            phone: rest.join(" ") || phoneEl.value
+          }
+        };
+      }
+
       if (cmd === "/remove") {
-        return { kind: "tool", tool: "remove_item", args: { lineId: Number(rest[0]) } };
+        if (rest[0] && /^\d+$/.test(rest[0])) {
+          return { kind: "tool", tool: "remove_item", args: { lineId: Number(rest[0]) } };
+        }
+        const last = getLastOrderLine();
+        if (last) {
+          return { kind: "tool", tool: "remove_item", args: { lineId: Number(last.lineId) } };
+        }
+        throw new Error("No line id provided and no current item to remove.");
       }
 
       if (cmd === "/order") {
@@ -1113,7 +1429,7 @@
       if (cmd === "/help") {
         return {
           kind: "local",
-          message: "Try plain language: 'I want cheese pizza', 'show menu', 'get bill'. Slash commands still work: /menu /new /add /order /bill"
+          message: "Try plain language: 'add olives on my pizza', 'make it large', 'set delivery to 123 Main St'. Slash commands: /menu /new /add /extra /noextra /size /qty /delivery /pickup /order /bill"
         };
       }
 
@@ -1164,6 +1480,9 @@
       if (textLower.includes("extra cheese") || textLower.includes("cheese please")) {
         extras.push("extra-cheese");
       }
+      if (textLower.includes("cheese crust")) {
+        extras.push("extra-cheese");
+      }
       if (textLower.includes("basil")) extras.push("basil");
       if (textLower.includes("olive")) extras.push("olives");
       if (textLower.includes("jalapeno") || textLower.includes("jalape") ) extras.push("jalapeno");
@@ -1171,14 +1490,47 @@
       return extras;
     }
 
+    function getLastOrderLine() {
+      if (!currentOrder || !currentOrder.lines.length) return null;
+      return currentOrder.lines[currentOrder.lines.length - 1];
+    }
+
+    function extractAddress(rawText, lowerText) {
+      const marker = "deliver to";
+      const markerIndex = lowerText.indexOf(marker);
+      if (markerIndex >= 0) {
+        return rawText.slice(markerIndex + marker.length).trim();
+      }
+      return "";
+    }
+
+    function extractName(rawText) {
+      const match = rawText.match(/my name is\s+(.+)/i);
+      if (match) return match[1].trim();
+      return "";
+    }
+
+    function extractPhone(rawText) {
+      const match = rawText.match(/(?:phone|call me at|number is)\s*[:\-]?\s*([+()\d\s-]{6,})/i);
+      if (match) return match[1].trim();
+      return "";
+    }
+
     function inferNaturalIntent(text) {
-      const lower = text.toLowerCase().trim();
+      const raw = String(text || "").trim();
+      const lower = raw.toLowerCase().trim();
 
       if (!lower) {
         return { kind: "local", message: "Please type a request." };
       }
 
-      if (lower.includes("menu") || lower.includes("what do you have")) {
+      const extras = detectExtras(lower);
+      const size = detectSize(lower);
+      const quantity = detectQuantity(lower);
+      const itemId = detectItemId(lower);
+      const lastLine = getLastOrderLine();
+
+      if (lower.includes("menu") || lower.includes("what do you have") || lower.includes("show options")) {
         const category = lower.includes("pizza") ? "pizza" : lower.includes("salad") ? "salad" : lower.includes("drink") ? "drink" : lower.includes("side") ? "side" : undefined;
         return { kind: "tool", tool: "get_menu", args: category ? { category } : {} };
       }
@@ -1196,8 +1548,35 @@
         };
       }
 
+      const extractedName = extractName(raw);
+      if (extractedName) {
+        return { kind: "tool", tool: "update_order_details", args: { customerName: extractedName } };
+      }
+
+      const extractedPhone = extractPhone(raw);
+      if (extractedPhone) {
+        return { kind: "tool", tool: "update_order_details", args: { phone: extractedPhone } };
+      }
+
+      if (lower.includes("delivery") || lower.includes("deliver to")) {
+        return {
+          kind: "tool",
+          tool: "update_order_details",
+          args: {
+            orderType: "delivery",
+            address: extractAddress(raw, lower) || addressEl.value
+          }
+        };
+      }
+
+      if (lower.includes("pickup")) {
+        return { kind: "tool", tool: "update_order_details", args: { orderType: "pickup" } };
+      }
+
       if (lower.includes("bill") || lower.includes("total") || lower.includes("pay") || lower.includes("price")) {
-        const tipMatch = lower.match(/(\d{1,2})\s*%?/);
+        const tipMatch = lower.includes("tip")
+          ? lower.match(/(\d{1,2})\s*%?/)
+          : lower.match(/bill\s+(\d{1,2})/);
         const tipPercent = tipMatch ? Number(tipMatch[1]) : 0;
         return { kind: "tool", tool: "get_bill", args: { tipPercent } };
       }
@@ -1210,30 +1589,82 @@
         return { kind: "tool", tool: "get_order", args: {} };
       }
 
+      const removeExtrasIntent = extras.length && (lower.includes("without") || lower.includes("no ") || lower.includes("remove "));
+      if (removeExtrasIntent) {
+        return { kind: "tool", tool: "remove_extras", args: { extras, preferPizza: true } };
+      }
+
+      const addExtrasIntent = extras.length && (lower.includes("add") || lower.includes("with") || lower.includes("on my") || lower.includes("topping") || lower.includes("extra"));
+      if (addExtrasIntent && !itemId) {
+        if (!lastLine) {
+          return { kind: "local", message: "Please add a pizza first, then I can add extras like olives or basil." };
+        }
+        return { kind: "tool", tool: "add_extras", args: { extras, preferPizza: true } };
+      }
+
+      const sizeChangeIntent = size && (lower.includes("make it") || lower.includes("change") || lower.includes("size") || lower.includes("switch"));
+      if (sizeChangeIntent) {
+        if (!lastLine) {
+          return { kind: "local", message: "Please add an item first, then I can change its size." };
+        }
+        return { kind: "tool", tool: "update_item", args: { size, preferPizza: true } };
+      }
+
+      const qtyChangeIntent = (lower.includes("quantity") || lower.includes("make it") || lower.includes("set to") || lower.includes("change to")) && /\b\d{1,2}\b/.test(lower);
+      if (qtyChangeIntent && !itemId) {
+        if (!lastLine) {
+          return { kind: "local", message: "Please add an item first, then I can change quantity." };
+        }
+        return { kind: "tool", tool: "update_item", args: { quantity, preferPizza: true } };
+      }
+
+      if ((lower.includes("one more") || lower.includes("another one") || lower.includes("same again")) && lastLine) {
+        return {
+          kind: "tool",
+          tool: "add_item",
+          args: {
+            itemId: lastLine.itemId,
+            size: lastLine.size,
+            quantity: 1,
+            extras: lastLine.extras.map((extra) => extra.id)
+          }
+        };
+      }
+
       if (lower.includes("remove")) {
         const lineIdMatch = lower.match(/\b(\d+)\b/);
         if (lineIdMatch) {
           return { kind: "tool", tool: "remove_item", args: { lineId: Number(lineIdMatch[1]) } };
         }
+        if (lastLine) {
+          return { kind: "tool", tool: "remove_item", args: { lineId: Number(lastLine.lineId) } };
+        }
       }
 
-      const itemId = detectItemId(lower);
       if (itemId) {
         return {
           kind: "tool",
           tool: "add_item",
           args: {
             itemId,
-            size: detectSize(lower),
-            quantity: detectQuantity(lower),
-            extras: detectExtras(lower)
+            size,
+            quantity,
+            extras
           }
         };
       }
 
+      if (extras.length) {
+        return { kind: "tool", tool: "add_extras", args: { extras, preferPizza: true } };
+      }
+
+      if (lower.includes("hi") || lower.includes("hello") || lower.includes("hey")) {
+        return { kind: "local", message: "Hi. You can say things like: 'add olives on my pizza', 'make it large', or 'set delivery to 123 Main St'." };
+      }
+
       return {
         kind: "local",
-        message: "I did not catch that. Try: 'I want cheese pizza', 'show menu', or 'get my bill'."
+        message: "I did not catch that. Try: 'add olives on my pizza', 'make it large', 'set delivery to 123 Main St', or 'get my bill'."
       };
     }
 
@@ -1260,10 +1691,34 @@
         return "Order " + order.orderId + " is ready for " + order.customerName + " (" + order.orderType + ").";
       }
 
+      if (tool === "update_order_details") {
+        const order = result.order;
+        return "Order details updated: " + order.orderType + (order.address ? " to " + order.address : "") + ".";
+      }
+
       if (tool === "add_item") {
         const line = result.addedLine;
         const size = line.size ? " (" + line.size + ")" : "";
         return "Added " + line.quantity + " x " + line.name + size + " to your order.";
+      }
+
+      if (tool === "update_item") {
+        const line = result.updatedLine;
+        const size = line.size ? " (" + line.size + ")" : "";
+        return "Updated line " + line.lineId + ": " + line.quantity + " x " + line.name + size + ".";
+      }
+
+      if (tool === "add_extras") {
+        const line = result.updatedLine;
+        const extras = line.extras.map((extra) => extra.id).join(", ");
+        return "Added extras to line " + line.lineId + ": " + extras + ".";
+      }
+
+      if (tool === "remove_extras") {
+        const line = result.updatedLine;
+        const extras = line.extras.map((extra) => extra.id).join(", ");
+        const suffix = extras ? extras : "no extras";
+        return "Updated extras on line " + line.lineId + ": " + suffix + ".";
       }
 
       if (tool === "remove_item") {
@@ -1470,6 +1925,34 @@
               return;
             }
 
+            if (action === "olives-last") {
+              const result = runToolCall("add_extras", { extras: ["olives"], preferPizza: true });
+              renderOrderSummary();
+              addMessage("assistant", toFriendlyMessage("add_extras", result));
+              return;
+            }
+
+            if (action === "size-large") {
+              const result = runToolCall("update_item", { size: "large", preferPizza: true });
+              renderOrderSummary();
+              addMessage("assistant", toFriendlyMessage("update_item", result));
+              return;
+            }
+
+            if (action === "delivery") {
+              const result = runToolCall("update_order_details", { orderType: "delivery", address: addressEl.value });
+              renderOrderSummary();
+              addMessage("assistant", toFriendlyMessage("update_order_details", result));
+              return;
+            }
+
+            if (action === "pickup") {
+              const result = runToolCall("update_order_details", { orderType: "pickup" });
+              renderOrderSummary();
+              addMessage("assistant", toFriendlyMessage("update_order_details", result));
+              return;
+            }
+
             if (action === "order") {
               const result = runToolCall("get_order", {});
               renderOrderSummary();
@@ -1560,7 +2043,7 @@
 
     addMessage(
       "assistant",
-      "Welcome. You can type naturally now.\nTry: 'I want cheese pizza', 'show menu', or 'get my bill'."
+      "Welcome. You can type naturally now.\nTry: 'I want cheese pizza', 'add olives on my pizza', 'make it large', or 'set delivery to 123 Main St'."
     );
   </script>
 </body>

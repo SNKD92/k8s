@@ -69,6 +69,23 @@
       }
     },
     {
+      "name": "update_order_details",
+      "description": "Update customer/order settings like delivery mode, address, phone, and name.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customerName": { "type": "string" },
+          "phone": { "type": "string" },
+          "orderType": {
+            "type": "string",
+            "enum": ["pickup", "delivery"]
+          },
+          "address": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
       "name": "add_item",
       "description": "Add a menu item to the active order.",
       "inputSchema": {
@@ -85,6 +102,77 @@
             "minimum": 1,
             "maximum": 20
           },
+          "extras": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "update_item",
+      "description": "Update an existing order line (size, quantity, item, or extras). If lineId is omitted, last relevant line is used.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "lineId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "itemId": { "type": "string" },
+          "size": {
+            "type": "string",
+            "enum": ["small", "medium", "large"]
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "extras": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "preferPizza": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "add_extras",
+      "description": "Add extras to an existing line (lineId optional).",
+      "inputSchema": {
+        "type": "object",
+        "required": ["extras"],
+        "properties": {
+          "lineId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "itemId": { "type": "string" },
+          "preferPizza": { "type": "boolean" },
+          "extras": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "remove_extras",
+      "description": "Remove extras from an existing line (lineId optional).",
+      "inputSchema": {
+        "type": "object",
+        "required": ["extras"],
+        "properties": {
+          "lineId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "itemId": { "type": "string" },
+          "preferPizza": { "type": "boolean" },
           "extras": {
             "type": "array",
             "items": { "type": "string" }
@@ -145,12 +233,10 @@
     }
   ],
   "sampleToolCall": {
-    "tool": "add_item",
+    "tool": "add_extras",
     "arguments": {
-      "itemId": "margherita",
-      "size": "large",
-      "quantity": 2,
-      "extras": ["extra-cheese", "basil"]
+      "lineId": 1,
+      "extras": ["olives", "basil"]
     }
   },
   "sampleJsonRpcCall": {
