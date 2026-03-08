@@ -18,20 +18,31 @@ RUN BUILD_TS="$BUILD_TIME_ISO"; \
     sed -i "s|__BUILD_TIME_ISO__|$BUILD_TS|g" /usr/share/nginx/html/index.html /usr/share/nginx/html/solution.html
 
 # Ensure nginx serves UTF-8 encoding
-RUN printf "server {\n\
-    listen 80;\n\
-    server_name localhost;\n\
-\n\
-    root /usr/share/nginx/html;\n\
-    index index.html;\n\
-\n\
-    charset utf-8;\n\
-\n\
-    location / {\n\
-        try_files \$uri \$uri/ =404;\n\
-    }\n\
-}\n" > /etc/nginx/conf.d/default.conf
-
+RUN printf '%s\n' \
+'server {' \
+'    listen 80;' \
+'    server_name localhost;' \
+'' \
+'    root /usr/share/nginx/html;' \
+'    index index.html;' \
+'' \
+'    charset utf-8;' \
+'' \
+'    location /ollama/ {' \
+'        proxy_http_version 1.1;' \
+'        proxy_set_header Host $host;' \
+'        proxy_set_header X-Real-IP $remote_addr;' \
+'        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
+'        proxy_set_header X-Forwarded-Proto $scheme;' \
+'        proxy_read_timeout 300s;' \
+'        proxy_send_timeout 300s;' \
+'        proxy_pass http://ollama.llm.svc.cluster.local:11434/;' \
+'    }' \
+'' \
+'    location / {' \
+'        try_files $uri $uri/ =404;' \
+'    }' \
+'}' > /etc/nginx/conf.d/default.conf
 # Expose port 80
 EXPOSE 80
 
