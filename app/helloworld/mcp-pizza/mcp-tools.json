@@ -1,0 +1,166 @@
+{
+  "server": {
+    "name": "pizza-place-mcp",
+    "version": "1.0.0",
+    "description": "MCP-ready pizza ordering tools exposed by the /mcp-pizza demo chat.",
+    "basePath": "/mcp-pizza"
+  },
+  "transport": {
+    "mode": "browser-demo",
+    "notes": [
+      "This is a static MCP-ready demo: tools are executed in-browser for quick testing.",
+      "Agents can inspect this contract and submit tool calls through the chat input in JSON format."
+    ]
+  },
+  "references": [
+    {
+      "name": "pizza_mcp_contract",
+      "description": "Tool contract JSON for personal agents.",
+      "url": "/mcp-pizza/mcp-tools.json"
+    },
+    {
+      "name": "pizza_chat_ui",
+      "description": "Interactive MCP-ready pizza chat page.",
+      "url": "/mcp-pizza"
+    },
+    {
+      "name": "mcp_official_docs",
+      "description": "Official Model Context Protocol documentation.",
+      "url": "https://modelcontextprotocol.io"
+    },
+    {
+      "name": "pizza_ui_source",
+      "description": "Source implementation for the pizza MCP page.",
+      "url": "https://github.com/SNKD92/k8s/blob/main/app/helloworld/mcp-pizza/index.html"
+    }
+  ],
+  "tools": [
+    {
+      "name": "get_menu",
+      "description": "Return pizza place menu, sizes, extras, and prices.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["pizza", "salad", "side", "drink"],
+            "description": "Optional category filter."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "create_order",
+      "description": "Create a new draft order.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customerName": { "type": "string" },
+          "phone": { "type": "string" },
+          "orderType": {
+            "type": "string",
+            "enum": ["pickup", "delivery"]
+          },
+          "address": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "add_item",
+      "description": "Add a menu item to the active order.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["itemId"],
+        "properties": {
+          "itemId": { "type": "string" },
+          "size": {
+            "type": "string",
+            "enum": ["small", "medium", "large"]
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "extras": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "remove_item",
+      "description": "Remove an order line by lineId.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["lineId"],
+        "properties": {
+          "lineId": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_order",
+      "description": "Return the current order details and subtotal.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "place_order",
+      "description": "Mark the draft order as placed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "notes": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "get_bill",
+      "description": "Return itemized bill with subtotal, tax, fees, tip, and final total.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tipPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 40
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ],
+  "sampleToolCall": {
+    "tool": "add_item",
+    "arguments": {
+      "itemId": "margherita",
+      "size": "large",
+      "quantity": 2,
+      "extras": ["extra-cheese", "basil"]
+    }
+  },
+  "sampleJsonRpcCall": {
+    "jsonrpc": "2.0",
+    "id": "42",
+    "method": "tools/call",
+    "params": {
+      "name": "get_bill",
+      "arguments": {
+        "tipPercent": 12
+      }
+    }
+  }
+}

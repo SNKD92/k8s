@@ -11,6 +11,7 @@ ARG BUILD_TIME_ISO=auto
 COPY index.html solution.html /usr/share/nginx/html/
 COPY cv.pdf /usr/share/nginx/html/
 COPY mcp/ /usr/share/nginx/html/mcp/
+COPY mcp-pizza/ /usr/share/nginx/html/mcp-pizza/
 COPY diagrams/ /usr/share/nginx/html/diagrams/
 
 # Inject image build time into static pages

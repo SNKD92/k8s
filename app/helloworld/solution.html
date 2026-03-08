@@ -492,6 +492,7 @@
       </p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="/mcp">Open Chatbot (/mcp)</a>
+        <a class="btn btn-primary" href="/mcp-pizza">Open Pizza MCP Chat (/mcp-pizza)</a>
         <a class="btn btn-primary" href="/">Back to Home</a>
         <a class="btn btn-secondary" href="/cv.pdf" target="_blank" rel="noopener noreferrer">Download CV (PDF)</a>
         <a class="btn btn-secondary" href="https://github.com/SNKD92/k8s" target="_blank" rel="noopener noreferrer">View Repository</a>
@@ -581,9 +582,9 @@
       </article>
 
       <article class="card" id="mcp">
-        <h2>MCP Chat and LLM</h2>
-        <p class="plain">The MCP page is a chat interface backed by Ollama inside the same cluster.</p>
-        <p class="tech">The page is served by the app container at <code>/mcp</code>. Requests to <code>/ollama/api/chat</code> are reverse-proxied by NGINX to the <code>ollama</code> service in namespace <code>llm</code>. The LLM pod runs on a dedicated tainted node pool, and backend timeout is extended for longer responses.</p>
+        <h2>MCP Chats and LLM</h2>
+        <p class="plain">The platform now serves two MCP-oriented chat pages: a general assistant at <code>/mcp</code> and a pizza-ordering MCP demo at <code>/mcp-pizza</code>.</p>
+        <p class="tech">The general page at <code>/mcp</code> calls <code>/ollama/api/chat</code> through NGINX to the <code>ollama</code> service in namespace <code>llm</code>. The pizza page at <code>/mcp-pizza</code> includes an MCP-ready tool contract JSON and deterministic menu/order/bill tool handling in the browser, so agent calls can be tested with structured payloads.</p>
         <figure class="diagram">
           <a class="diagram-link" href="/diagrams/mcp-chat-flow.svg">
             <img src="/diagrams/mcp-chat-flow.svg" alt="MCP chat scheme showing deployment pipeline and runtime request flow to Ollama." loading="lazy">
@@ -592,11 +593,19 @@
         </figure>
         <div class="links">
           <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/mcp/index.html" target="_blank" rel="noopener noreferrer">MCP page</a>
+          <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/mcp-pizza/index.html" target="_blank" rel="noopener noreferrer">Pizza MCP page</a>
+          <a href="/mcp-pizza/mcp-tools.json" target="_blank" rel="noopener noreferrer">Pizza MCP API description</a>
           <a href="/cv.pdf" target="_blank" rel="noopener noreferrer">CV PDF</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/app/helloworld/Dockerfile" target="_blank" rel="noopener noreferrer">nginx proxy config</a>
           <a href="https://github.com/SNKD92/k8s/tree/main/k8s/llm" target="_blank" rel="noopener noreferrer">llm manifests</a>
           <a href="https://github.com/SNKD92/k8s/blob/main/k8s/app/backendconfig.yaml" target="_blank" rel="noopener noreferrer">backend timeout</a>
         </div>
+        <p class="tech">
+          References:
+          <a href="/mcp-pizza/mcp-tools.json" target="_blank" rel="noopener noreferrer">API contract</a> (tool schemas),
+          <a href="/mcp-pizza" target="_blank" rel="noopener noreferrer">pizza UI</a> (interactive order flow),
+          <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">MCP docs</a> (protocol concepts).
+        </p>
       </article>
 
       <article class="card" id="cert">
