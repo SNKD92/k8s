@@ -46,7 +46,7 @@
   <text x="28" y="246" fill="#22d3ee" font-family="Manrope, Arial, sans-serif" font-size="14" font-weight="700">Runtime Request</text>
   <rect x="20" y="262" width="170" height="128" rx="12" fill="url(#box)" stroke="#22d3ee"/>
   <text x="34" y="292" fill="#e8f0ff" font-family="Manrope, Arial, sans-serif" font-size="15" font-weight="700">Browser</text>
-  <text x="34" y="314" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="12">Open /MCP</text>
+  <text x="34" y="314" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="12">Open /mcp</text>
   <text x="34" y="332" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="12">POST /ollama/api/chat</text>
 
   <rect x="220" y="262" width="170" height="128" rx="12" fill="url(#box)" stroke="#22d3ee"/>
@@ -56,7 +56,7 @@
 
   <rect x="420" y="262" width="170" height="128" rx="12" fill="url(#box)" stroke="#22d3ee"/>
   <text x="434" y="292" fill="#e8f0ff" font-family="Manrope, Arial, sans-serif" font-size="15" font-weight="700">App NGINX Pod</text>
-  <text x="434" y="314" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="12">Serves /MCP static UI</text>
+  <text x="434" y="314" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="12">Serves /mcp static UI</text>
   <text x="434" y="332" fill="#b6c5dd" font-family="Manrope, Arial, sans-serif" font-size="12">Proxies /ollama/*</text>
 
   <rect x="620" y="262" width="150" height="128" rx="12" fill="url(#box)" stroke="#22d3ee"/>
